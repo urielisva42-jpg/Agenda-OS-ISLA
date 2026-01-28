@@ -1,0 +1,804 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OS ISLA</title>
+<style>
+:root{--bg:#0b1220;--card:#111a2e;--muted:#c7d2fe;--text:#f5f7ff;--accent:#ff3ea5;--accent2:#6ea8ff;--ok:#2dd4bf;--bad:#fb7185;}
+*{box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+body{margin:0;background:linear-gradient(180deg,#0b0012,var(--bg));color:var(--text)}
+/* top hero */
+.hero{padding:18px 16px 14px;background:linear-gradient(135deg, rgba(255,62,165,.95), rgba(110,168,255,.55));}
+.hero h1{margin:0;font-size:22px;letter-spacing:.5px}
+.hero p{margin:8px 0 0;color:rgba(255,255,255,.92);font-size:13px;line-height:1.35}
+.container{max-width:720px;margin:0 auto;padding:0 14px 90px}
+.card{background:rgba(17,26,46,.92);border:1px solid rgba(255,255,255,.12);border-radius:18px;box-shadow:0 12px 26px rgba(0,0,0,.25);padding:14px}
+.sectionTitle{font-weight:900;font-size:18px;margin:0 0 10px}
+.small{font-size:12px;color:rgba(255,255,255,.82)}
+.btnGrid{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.bigBtn{width:100%;padding:18px 16px;border:0;border-radius:16px;background:#ffffff;color:#111827;font-size:18px;font-weight:900;text-align:left}
+.bigBtn span{display:block;font-size:12px;font-weight:700;color:#6b7280;margin-top:4px}
+.nav{position:fixed;left:0;right:0;bottom:0;background:rgba(8,10,20,.92);border-top:1px solid rgba(255,255,255,.12);backdrop-filter: blur(10px);}
+.navInner{max-width:720px;margin:0 auto;display:flex;gap:10px;padding:10px 12px}
+.nav button{flex:1;border:0;border-radius:14px;padding:12px 10px;background:transparent;color:rgba(255,255,255,.9);font-weight:900}
+.nav button.active{background:rgba(255,62,165,.22);border:1px solid rgba(255,62,165,.35)}
+/* views */
+.view{display:none}
+.view.active{display:block}
+/* forms */
+label{display:block;font-size:12px;color:rgba(255,255,255,.85);margin:10px 0 6px}
+input,select,textarea{width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(6,10,20,.55);color:var(--text);outline:none}
+textarea{min-height:76px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:480px){.row{grid-template-columns:1fr}}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.actions button{border:0;border-radius:14px;padding:12px 12px;font-weight:950}
+.primary{background:var(--accent);color:#150014}
+.secondary{background:transparent;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.95)}
+.ok{background:var(--ok);color:#051014}
+.bad{background:var(--bad);color:#12030b}
+/* suggestions */
+.suggest{border:1px solid rgba(255,255,255,.16);background:rgba(6,10,20,.75);border-radius:14px;max-height:220px;overflow:auto;display:none}
+.suggest div{padding:12px 10px;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer}
+.suggest div:last-child{border-bottom:none}
+.suggest div:hover{background:rgba(110,168,255,.18)}
+/* calendar */
+.day{margin:10px 0}
+.day h3{margin:0 0 8px;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:12px;color:rgba(255,255,255,.85)}
+.item{border:1px solid rgba(255,255,255,.12);background:rgba(6,10,20,.4);border-radius:16px;padding:12px;margin:8px 0}
+.item b{display:block;font-size:14px}
+.meta{font-size:12px;color:rgba(255,255,255,.82);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap}
+.tag{font-size:12px;padding:3px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.9)}
+.tag.Pendiente{border-color:rgba(251,191,36,.6);color:#ffd88a}
+.tag.Realizada{border-color:rgba(45,212,191,.6);color:#8ff5e6}
+.tag.Reprogramada{border-color:rgba(110,168,255,.6);color:#b8d4ff}
+.tag.Cancelada{border-color:rgba(251,113,133,.6);color:#ffb3bf}
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.62);display:none;padding:14px}
+.modal{max-width:720px;margin:0 auto;background:rgba(17,26,46,.96);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:14px}
+.modal h2{margin:0 0 10px;font-size:18px}
+/* lock */
+.lockwrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.lock{width:min(520px,100%);background:rgba(17,26,46,.95);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:16px}
+.lock h2{margin:0 0 8px;font-size:20px}
+.lock .hint{font-size:12px;color:rgba(255,255,255,.85);margin-bottom:10px}
+.lock button{width:100%;border:0;border-radius:14px;padding:12px;background:var(--accent);color:#150014;font-weight:950}
+.lock .ghost{background:transparent;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.95);margin-top:10px}
+hr{border:none;height:1px;background:rgba(255,255,255,.14);margin:12px 0}
+</style>
+</head>
+<body>
+
+<!-- LOCK -->
+<div id="lockScreen" class="lockwrap">
+  <div class="lock">
+    <h2>🔐 OS ISLA</h2>
+    <div class="hint">Ingresa tu PIN de 6 dígitos.</div>
+    <input id="pinInput" inputmode="numeric" maxlength="6" placeholder="••••••">
+    <button id="enterBtn">Entrar</button>
+    <button id="changePinBtn" class="ghost" type="button">Cambiar PIN</button>
+    <div class="small" style="margin-top:10px">PIN inicial: <b>123456</b></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+  <div class="hero">
+    <div class="container" style="padding:0 14px">
+      <h1>OS ISLA</h1>
+      <p>Herramienta sencilla para organizar tu día de trabajo en Compartamos Banco.</p>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- HOME -->
+    <section id="view-home" class="view active">
+      <div class="card">
+        <div class="sectionTitle">Actividades de hoy</div>
+        <div id="todayBox" class="small">Aún no hay actividades para hoy.</div>
+      </div>
+
+      <div class="btnGrid">
+        <button class="bigBtn" data-go="cp">Buscar Código Postal<span>Colonia o CP (SEPOMEX precargado)</span></button>
+        <button class="bigBtn" data-go="oficios">Catálogo de Oficios<span>Busca oficio y obtén código</span></button>
+        <button class="bigBtn" data-go="numeros">Números Oficiales de Veracruz<span>Llamar con un toque</span></button>
+        <button class="bigBtn" data-go="cal">Calendario<span>Agenda semanal y actividades</span></button>
+        <button class="bigBtn" data-go="ciclos">Calculadora de ciclos<span>Semana 12 (semanal) / Semana 16 (bisemanal)</span></button>
+      </div>
+    
+      <div style="margin-top:16px;text-align:center;font-size:12px;color:rgba(255,255,255,.7)">
+        OS ISLA © <span id="year"></span> · Versión 1.0<br>
+        Desarrollado por Uriel Isva · Uso interno
+      </div>
+
+    </section>
+
+    <!-- CP -->
+    <section id="view-cp" class="view">
+      <div class="card">
+        <div class="sectionTitle">Buscar Código Postal</div>
+        <div class="small">Escribe una colonia o un CP. Si hay repetidas, elige la opción correcta.</div>
+
+        <label>Buscar (CP o colonia)</label>
+        <input id="cpQuery" placeholder="Ej. 91700 o Centro">
+        <div id="cpSuggest" class="suggest"></div>
+
+        <div id="cpResult" class="small" style="margin-top:12px"></div>
+
+        <div class="actions">
+          <button class="secondary" type="button" id="cpBack">Volver</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Oficios -->
+    <section id="view-oficios" class="view">
+      <div class="card">
+        <div class="sectionTitle">Catálogo de Oficios</div>
+        <div class="small">Escribe el oficio. Selecciona y se llena código/categoría.</div>
+
+        <label>Buscar oficio</label>
+        <input id="ofQuery" placeholder="Ej. Agencia de turismo">
+        <div id="ofSuggest" class="suggest"></div>
+
+        <div class="row">
+          <div>
+            <label>Código</label>
+            <input id="ofCode" placeholder="—" readonly>
+          </div>
+          <div>
+            <label>Categoría</label>
+            <input id="ofCat" placeholder="—" readonly>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="secondary" type="button" id="ofBack">Volver</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Numeros -->
+    <section id="view-numeros" class="view">
+      <div class="card">
+        <div class="sectionTitle">Números Oficiales de Veracruz</div>
+        <div class="small">Editables (puedes cambiar los números en el código después).</div>
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+          <button class="bigBtn" type="button" onclick="callNumber('911')">Emergencias 911<span>Llamar</span></button>
+          <button class="bigBtn" type="button" onclick="callNumber('089')">Denuncia anónima 089<span>Llamar</span></button>
+          <button class="bigBtn" type="button" onclick="callNumber('8002209000')">Compartamos (Ejemplo)<span>Llamar</span></button>
+        </div>
+        <div class="actions">
+          <button class="secondary" type="button" id="numBack">Volver</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Calendar -->
+    <section id="view-cal" class="view">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
+          <div class="sectionTitle" style="margin:0">Calendario</div>
+          <div style="display:flex;gap:10px">
+            <button class="secondary" type="button" id="wkPrev">◀</button>
+            <button class="secondary" type="button" id="wkToday">Hoy</button>
+            <button class="secondary" type="button" id="wkNext">▶</button>
+          </div>
+        </div>
+        <div id="weekCard"></div>
+
+        <div class="actions">
+          <button class="primary" type="button" id="newAct">➕ Nueva actividad</button>
+          <button class="secondary" type="button" id="calBack">Volver</button>
+        </div>
+
+        <hr>
+        <div class="actions">
+          <button class="secondary" type="button" id="exportBtn">Exportar (JSON)</button>
+          <button class="secondary" type="button" id="importBtn">Importar</button>
+          <input id="importFile" type="file" accept="application/json" style="display:none">
+          <button class="secondary" type="button" id="lockBtn">Bloquear</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ciclos -->
+    <section id="view-ciclos" class="view">
+      <div class="card">
+        <div class="sectionTitle">Calculadora de ciclos</div>
+        <div class="small">Ingresa fecha, elige tipo de crédito y fecha de primer pago. Calcula la fecha de la semana 12 (semanal) o semana 16 (bisemanal).</div>
+
+        <label>Fecha (referencia)</label>
+        <input id="refDate" type="date">
+
+        <label>Tipo de crédito</label>
+        <select id="tipoCred">
+          <option value="semanal">Semanal</option>
+          <option value="bisemanal">Bisemanal</option>
+        </select>
+
+        <label>Fecha de primer pago</label>
+        <input id="firstPay" type="date">
+
+        <div class="actions">
+          <button class="primary" type="button" id="calcBtn">Calcular</button>
+          <button class="secondary" type="button" id="cyBack">Volver</button>
+        </div>
+
+        <div id="calcOut" class="card" style="margin-top:12px;display:none"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="nav">
+    <div class="navInner">
+      <button id="navHome" class="active" type="button">Inicio</button>
+      <button id="navCal" type="button">Calendario</button>
+      <button id="navLock" type="button">Bloquear</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL Activity -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2>Nueva actividad</h2>
+    <label>Cliente</label>
+    <input id="f_cliente" placeholder="Nombre completo">
+
+    <div class="row">
+      <div>
+        <label>Teléfono</label>
+        <input id="f_tel" inputmode="tel" placeholder="10 dígitos (opcional)">
+      </div>
+      <div>
+        <label>Estatus</label>
+        <select id="f_estatus">
+          <option value="Pendiente">Pendiente</option>
+          <option value="Realizada">Realizada</option>
+          <option value="Reprogramada">Reprogramada</option>
+          <option value="Cancelada">Cancelada</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Fecha</label>
+        <input id="f_fecha" type="date">
+      </div>
+      <div>
+        <label>Hora</label>
+        <input id="f_hora" type="time">
+      </div>
+    </div>
+
+    <hr>
+
+    <label>Colonia (escribe y elige)</label>
+    <input id="f_colonia" placeholder="Ej. Centro">
+    <div id="colSuggest" class="suggest"></div>
+
+    <div class="row">
+      <div>
+        <label>CP</label>
+        <input id="f_cp" placeholder="Se llena solo">
+      </div>
+      <div>
+        <label>Municipio</label>
+        <input id="f_mun" placeholder="Se llena solo">
+      </div>
+    </div>
+    <label>Estado</label>
+    <input id="f_edo" placeholder="Se llena solo">
+
+    <label>Dirección</label>
+    <input id="f_dir" placeholder="Calle, número, referencias">
+
+    <hr>
+
+    <label>Ocupación (busca por nombre)</label>
+    <input id="f_ocup" placeholder="Ej. Agencia de turismo">
+    <div id="ocupSuggest" class="suggest"></div>
+
+    <div class="row">
+      <div>
+        <label>Código ocupación</label>
+        <input id="f_ocup_code" placeholder="Se llena solo">
+      </div>
+      <div>
+        <label>Categoría</label>
+        <input id="f_ocup_cat" placeholder="Se llena solo">
+      </div>
+    </div>
+
+    <label>Notas</label>
+    <textarea id="f_notas" placeholder="Seguimiento, documentos, etc."></textarea>
+
+    <div class="actions">
+      <button class="ok" type="button" id="mapsBtn">📍 Abrir en Maps</button>
+      <button class="primary" type="button" id="saveBtn">Guardar</button>
+      <button class="bad" type="button" id="cancelBtn">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =================== CATALOGS (precargados) ===================
+const SEPOMEX_COLONIAS = [{"k": "isla centro", "colonia": "Isla Centro", "tipo": "Colonia", "cp": "95640", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "cetis", "colonia": "Cetis", "tipo": "Colonia", "cp": "95642", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "el para�so", "colonia": "El Para�so", "tipo": "Colonia", "cp": "95643", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "benito ju�rez", "colonia": "Benito Ju�rez", "tipo": "Colonia", "cp": "95643", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "l�zaro c�rdenas", "colonia": "L�zaro C�rdenas", "tipo": "Colonia", "cp": "95643", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "san jos�", "colonia": "San Jos�", "tipo": "Colonia", "cp": "95643", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "san juan de dios", "colonia": "San Juan de Dios", "tipo": "Colonia", "cp": "95643", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "emiliano zapata", "colonia": "Emiliano Zapata", "tipo": "Colonia", "cp": "95645", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "la loma", "colonia": "La Loma", "tipo": "Colonia", "cp": "95645", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "mariano aguirre uscanga", "colonia": "Mariano Aguirre Uscanga", "tipo": "Colonia", "cp": "95645", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "la luz", "colonia": "La Luz", "tipo": "Colonia", "cp": "95645", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "naranjo", "colonia": "Naranjo", "tipo": "Colonia", "cp": "95645", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "la gravera", "colonia": "La Gravera", "tipo": "Colonia", "cp": "95646", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "luis donaldo colosio", "colonia": "Luis Donaldo Colosio", "tipo": "Colonia", "cp": "95646", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "chamizal", "colonia": "Chamizal", "tipo": "Colonia", "cp": "95647", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "agropista", "colonia": "Agropista", "tipo": "Colonia", "cp": "95647", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "fernando l�pez arias", "colonia": "Fernando L�pez Arias", "tipo": "Colonia", "cp": "95648", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "lim�n de guerrero", "colonia": "Lim�n de Guerrero", "tipo": "Colonia", "cp": "95648", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "santa fe", "colonia": "Santa Fe", "tipo": "Colonia", "cp": "95648", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "obrera", "colonia": "Obrera", "tipo": "Colonia", "cp": "95648", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Isla"}, {"k": "san sim�n ii", "colonia": "San Sim�n II", "tipo": "Rancho", "cp": "95650", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san sim�n segundo (las �guilas)", "colonia": "San Sim�n Segundo (Las �guilas)", "tipo": "Rancher�a", "cp": "95650", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san nicol�s zacapexco", "colonia": "San Nicol�s Zacapexco", "tipo": "Pueblo", "cp": "95650", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el chancarro", "colonia": "El Chancarro", "tipo": "Rancher�a", "cp": "95650", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nuevo viloria", "colonia": "Nuevo Viloria", "tipo": "Rancher�a", "cp": "95650", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "las tunas", "colonia": "Las Tunas", "tipo": "Rancher�a", "cp": "95650", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "palmarillo", "colonia": "Palmarillo", "tipo": "Rancher�a", "cp": "95650", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "garro", "colonia": "Garro", "tipo": "Barrio", "cp": "95652", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el nanche", "colonia": "El Nanche", "tipo": "Rancher�a", "cp": "95652", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "raudal", "colonia": "Raudal", "tipo": "Rancher�a", "cp": "95652", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "vista hermosa", "colonia": "Vista Hermosa", "tipo": "Rancher�a", "cp": "95652", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "viloria viejo", "colonia": "Viloria Viejo", "tipo": "Rancher�a", "cp": "95652", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "las hojas (las hojitas)", "colonia": "Las Hojas (Las Hojitas)", "tipo": "Rancho", "cp": "95653", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "montecristo", "colonia": "Montecristo", "tipo": "Rancho", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "las playas", "colonia": "Las Playas", "tipo": "Rancher�a", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la esmeralda", "colonia": "La Esmeralda", "tipo": "Rancho", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la granja", "colonia": "La Granja", "tipo": "Ejido", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nuevo cant�n", "colonia": "Nuevo Cant�n", "tipo": "Barrio", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la ca�ada", "colonia": "La Ca�ada", "tipo": "Rancher�a", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "agua fr�a uno", "colonia": "Agua Fr�a Uno", "tipo": "Rancher�a", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "rodolfo fierro", "colonia": "Rodolfo Fierro", "tipo": "Rancher�a", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "totoloche", "colonia": "Totoloche", "tipo": "Rancher�a", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san anastacio (tachic�n)", "colonia": "San Anastacio (Tachic�n)", "tipo": "Colonia", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san pablo xalpa", "colonia": "San Pablo Xalpa", "tipo": "Rancher�a", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san pedro m�rtir", "colonia": "San Pedro M�rtir", "tipo": "Rancher�a", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "licenciado alfredo v. bonfil", "colonia": "Licenciado Alfredo V. Bonfil", "tipo": "Rancher�a", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el maguial (la laguna)", "colonia": "El Maguial (La Laguna)", "tipo": "Rancher�a", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "ignacio ram�rez", "colonia": "Ignacio Ram�rez", "tipo": "Rancher�a", "cp": "95654", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "las golondrinas", "colonia": "Las Golondrinas", "tipo": "Rancho", "cp": "95655", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "los dos hermanos", "colonia": "Los Dos Hermanos", "tipo": "Rancho", "cp": "95655", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el para�so", "colonia": "El Para�so", "tipo": "Rancho", "cp": "95655", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el paisaje", "colonia": "El Paisaje", "tipo": "Rancho", "cp": "95655", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "cerro colorado", "colonia": "Cerro Colorado", "tipo": "Rancho", "cp": "95655", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "palma de oro", "colonia": "Palma de Oro", "tipo": "Pueblo", "cp": "95655", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "chiltepec", "colonia": "Chiltepec", "tipo": "Rancher�a", "cp": "95655", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el pozon", "colonia": "El Pozon", "tipo": "Rancher�a", "cp": "95655", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "macuile", "colonia": "Macuile", "tipo": "Rancher�a", "cp": "95655", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "loma alta", "colonia": "Loma Alta", "tipo": "Rancher�a", "cp": "95655", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "garza blanca", "colonia": "Garza Blanca", "tipo": "Rancher�a", "cp": "95655", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la pe�a", "colonia": "La Pe�a", "tipo": "Pueblo", "cp": "95657", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "francisco villa", "colonia": "Francisco Villa", "tipo": "Rancher�a", "cp": "95657", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el cedral (palo gacho)", "colonia": "El Cedral (Palo Gacho)", "tipo": "Rancho", "cp": "95657", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "oro verde (el arenal)", "colonia": "Oro Verde (El Arenal)", "tipo": "Ejido", "cp": "95657", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san luis", "colonia": "San Luis", "tipo": "Rancher�a", "cp": "95657", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el marcial (el coyolar)", "colonia": "El Marcial (El Coyolar)", "tipo": "Rancher�a", "cp": "95657", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "santa mar�a", "colonia": "Santa Mar�a", "tipo": "Rancher�a", "cp": "95657", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "coapa", "colonia": "Coapa", "tipo": "Rancher�a", "cp": "95657", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "las garzas", "colonia": "Las Garzas", "tipo": "Rancher�a", "cp": "95657", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san ram�n", "colonia": "San Ram�n", "tipo": "Rancho", "cp": "95658", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "rancho nuevo", "colonia": "Rancho Nuevo", "tipo": "Rancho", "cp": "95658", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "mazoco", "colonia": "Mazoco", "tipo": "Rancher�a", "cp": "95658", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el mosquito", "colonia": "El Mosquito", "tipo": "Rancher�a", "cp": "95658", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nuevo potrero", "colonia": "Nuevo Potrero", "tipo": "Rancher�a", "cp": "95658", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el �ape", "colonia": "El �ape", "tipo": "Rancher�a", "cp": "95658", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "cujuluapan (el guayabo)", "colonia": "Cujuluapan (El Guayabo)", "tipo": "Rancher�a", "cp": "95658", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "mata limones", "colonia": "Mata Limones", "tipo": "Rancher�a", "cp": "95658", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "leyes de reforma", "colonia": "Leyes de Reforma", "tipo": "Rancher�a", "cp": "95658", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el tesoro", "colonia": "El Tesoro", "tipo": "Ejido", "cp": "95659", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "balboa", "colonia": "Balboa", "tipo": "Rancher�a", "cp": "95659", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "potrerillos", "colonia": "Potrerillos", "tipo": "Rancher�a", "cp": "95659", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "las macayas", "colonia": "Las Macayas", "tipo": "Rancher�a", "cp": "95659", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "palo blanco", "colonia": "Palo Blanco", "tipo": "Rancher�a", "cp": "95659", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "solerilla", "colonia": "Solerilla", "tipo": "Rancher�a", "cp": "95659", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "las cruces", "colonia": "Las Cruces", "tipo": "Rancher�a", "cp": "95659", "mun": "Isla", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "asentamiento", "colonia": "Asentamiento", "tipo": "Tipo de Asentamiento", "cp": "C�digo Postal", "mun": "Municipio", "edo": "Estado", "ciu": "Ciudad"}, {"k": "el pedregoso", "colonia": "El Pedregoso", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "solidaridad", "colonia": "Solidaridad", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "la perla", "colonia": "La Perla", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "del carmen", "colonia": "Del Carmen", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "san jos�", "colonia": "San Jos�", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "las limas", "colonia": "Las Limas", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "la concepci�n", "colonia": "La Concepci�n", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "chapultepec", "colonia": "Chapultepec", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "la florida", "colonia": "La Florida", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "la guadalupe", "colonia": "La Guadalupe", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "la loma", "colonia": "La Loma", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "las palmas", "colonia": "Las Palmas", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "playa vicente centro", "colonia": "Playa Vicente Centro", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "emiliano zapata", "colonia": "Emiliano Zapata", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "zorrillo", "colonia": "Zorrillo", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "lomas verdes", "colonia": "Lomas Verdes", "tipo": "Colonia", "cp": "95600", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Playa Vicente"}, {"k": "lealtad de mu�oz", "colonia": "Lealtad de Mu�oz", "tipo": "Pueblo", "cp": "95603", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "miguel l�pez", "colonia": "Miguel L�pez", "tipo": "Rancher�a", "cp": "95603", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "mata de ca�a", "colonia": "Mata de Ca�a", "tipo": "Pueblo", "cp": "95603", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "monte verde", "colonia": "Monte Verde", "tipo": "Rancho", "cp": "95603", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "santa elena", "colonia": "Santa Elena", "tipo": "Colonia", "cp": "95603", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la uni�n juan enr�quez", "colonia": "La Uni�n Juan Enr�quez", "tipo": "Colonia", "cp": "95603", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san francisco", "colonia": "San Francisco", "tipo": "Colonia", "cp": "95603", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la victoria", "colonia": "La Victoria", "tipo": "Rancher�a", "cp": "95603", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "arroyo bermejo", "colonia": "Arroyo Bermejo", "tipo": "Rancher�a", "cp": "95603", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el ramie", "colonia": "El Ramie", "tipo": "Rancher�a", "cp": "95603", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "juan enr�quez", "colonia": "Juan Enr�quez", "tipo": "Pueblo", "cp": "95603", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la petronila", "colonia": "La Petronila", "tipo": "Rancho", "cp": "95604", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "arroyo guadalupe la palma", "colonia": "Arroyo Guadalupe la Palma", "tipo": "Colonia", "cp": "95604", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "arroyo colorado", "colonia": "Arroyo Colorado", "tipo": "Pueblo", "cp": "95604", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san ram�n segundo", "colonia": "San Ram�n Segundo", "tipo": "Pueblo", "cp": "95605", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "ruiz cortines revoluci�n", "colonia": "Ruiz Cortines Revoluci�n", "tipo": "Rancher�a", "cp": "95605", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "tierra nueva", "colonia": "Tierra Nueva", "tipo": "Rancher�a", "cp": "95605", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nuevo ojitl�n", "colonia": "Nuevo Ojitl�n", "tipo": "Rancher�a", "cp": "95605", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "ed�n de las flores", "colonia": "Ed�n de las Flores", "tipo": "Colonia", "cp": "95605", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "carmen arroyo del gavil�n", "colonia": "Carmen Arroyo del Gavil�n", "tipo": "Rancher�a", "cp": "95605", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nuevo arroyo grande", "colonia": "Nuevo Arroyo Grande", "tipo": "Rancher�a", "cp": "95605", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "arroyo dehesa", "colonia": "Arroyo Dehesa", "tipo": "Rancher�a", "cp": "95605", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el mirador", "colonia": "El Mirador", "tipo": "Barrio", "cp": "95605", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "rancho grande", "colonia": "Rancho Grande", "tipo": "Pueblo", "cp": "95606", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "arroyo seco", "colonia": "Arroyo Seco", "tipo": "Pueblo", "cp": "95606", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la candelaria", "colonia": "La Candelaria", "tipo": "Colonia", "cp": "95606", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la reforma san felipe", "colonia": "La Reforma San Felipe", "tipo": "Colonia", "cp": "95606", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "loma de piedra", "colonia": "Loma de Piedra", "tipo": "Rancher�a", "cp": "95606", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "chilapa del carmen", "colonia": "Chilapa del Carmen", "tipo": "Pueblo", "cp": "95607", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "arenal santa ana", "colonia": "Arenal Santa Ana", "tipo": "Ejido", "cp": "95607", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "general hermenegildo galeana", "colonia": "General Hermenegildo Galeana", "tipo": "Pueblo", "cp": "95607", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el nigromante", "colonia": "El Nigromante", "tipo": "Pueblo", "cp": "95607", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la sabana carame", "colonia": "La Sabana Carame", "tipo": "Pueblo", "cp": "95609", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el zapotal", "colonia": "El Zapotal", "tipo": "Pueblo", "cp": "95609", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "piedra de cal", "colonia": "Piedra de Cal", "tipo": "Colonia", "cp": "95609", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "ampliaci�n chilapa", "colonia": "Ampliaci�n Chilapa", "tipo": "Colonia", "cp": "95609", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "�lvaro obreg�n", "colonia": "�lvaro Obreg�n", "tipo": "Rancher�a", "cp": "95609", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san jos� chilapa", "colonia": "San Jos� Chilapa", "tipo": "Pueblo", "cp": "95609", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el serrano", "colonia": "El Serrano", "tipo": "Pueblo", "cp": "95614", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san felipe zapotal", "colonia": "San Felipe Zapotal", "tipo": "Colonia", "cp": "95614", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "benito ju�rez", "colonia": "Benito Ju�rez", "tipo": "Colonia", "cp": "95614", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "arroyo zacate", "colonia": "Arroyo Zacate", "tipo": "Pueblo", "cp": "95618", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "tomatillo", "colonia": "Tomatillo", "tipo": "Pueblo", "cp": "95618", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la nueva era", "colonia": "La Nueva Era", "tipo": "Ejido", "cp": "95618", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "santa rosa", "colonia": "Santa Rosa", "tipo": "Ejido", "cp": "95618", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san gabriel", "colonia": "San Gabriel", "tipo": "Colonia", "cp": "95619", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la loma", "colonia": "La Loma", "tipo": "Rancher�a", "cp": "95619", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la florencia", "colonia": "La Florencia", "tipo": "Rancher�a", "cp": "95619", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "lindavista", "colonia": "Lindavista", "tipo": "Colonia", "cp": "95619", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "zanja de ca�a", "colonia": "Zanja de Ca�a", "tipo": "Rancher�a", "cp": "95619", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "tomate r�o manso", "colonia": "Tomate R�o Manso", "tipo": "Ejido", "cp": "95619", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "cuauht�moc", "colonia": "Cuauht�moc", "tipo": "Rancho", "cp": "95620", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "plan bonito", "colonia": "Plan Bonito", "tipo": "Rancher�a", "cp": "95620", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "abasolo del valle", "colonia": "Abasolo Del Valle", "tipo": "Pueblo", "cp": "95620", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el torito", "colonia": "El Torito", "tipo": "Rancher�a", "cp": "95622", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san isidro", "colonia": "San Isidro", "tipo": "Rancho", "cp": "95623", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el naranjo", "colonia": "El Naranjo", "tipo": "Rancho", "cp": "95623", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "�rsulo galv�n (la primavera)", "colonia": "�rsulo Galv�n (La Primavera)", "tipo": "Rancho", "cp": "95623", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "arroyo san pedro", "colonia": "Arroyo San Pedro", "tipo": "Pueblo", "cp": "95623", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "vicente guerrero", "colonia": "Vicente Guerrero", "tipo": "Rancher�a", "cp": "95623", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el vergel", "colonia": "El Vergel", "tipo": "Ejido", "cp": "95624", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "general guadalupe victoria", "colonia": "General Guadalupe Victoria", "tipo": "Rancher�a", "cp": "95625", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "coahuila", "colonia": "Coahuila", "tipo": "Rancher�a", "cp": "95626", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nuevo pescadito de arriba", "colonia": "Nuevo Pescadito de Arriba", "tipo": "Colonia", "cp": "95627", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nuevo arroyo del tigre", "colonia": "Nuevo Arroyo del Tigre", "tipo": "Rancher�a", "cp": "95627", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nuevo san mart�n", "colonia": "Nuevo San Mart�n", "tipo": "Pueblo", "cp": "95627", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nuevo raya caracol (zanja seca)", "colonia": "Nuevo Raya Caracol (Zanja Seca)", "tipo": "Pueblo", "cp": "95628", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "vega del joval", "colonia": "Vega del Joval", "tipo": "Rancho", "cp": "95628", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nuevo cosolapa sarmiento", "colonia": "Nuevo Cosolapa Sarmiento", "tipo": "Pueblo", "cp": "95628", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "arroyo le�n", "colonia": "Arroyo Le�n", "tipo": "Colonia", "cp": "95628", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "palma sola", "colonia": "Palma Sola", "tipo": "Rancher�a", "cp": "95628", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nuevo ixcatlan", "colonia": "Nuevo Ixcatlan", "tipo": "Ejido", "cp": "95628", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "agua fr�a nazareno", "colonia": "Agua Fr�a Nazareno", "tipo": "Rancher�a", "cp": "95629", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "andr�s g�mez alem�n", "colonia": "Andr�s G�mez Alem�n", "tipo": "Rancher�a", "cp": "95629", "mun": "Playa Vicente", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "rub�n r. jaramillo", "colonia": "Rub�n R. Jaramillo", "tipo": "Colonia", "cp": "95580", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "del bosque", "colonia": "Del Bosque", "tipo": "Colonia", "cp": "95580", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "tejeda", "colonia": "Tejeda", "tipo": "Colonia", "cp": "95580", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "v�zquez vela", "colonia": "V�zquez Vela", "tipo": "Colonia", "cp": "95580", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "venecia", "colonia": "Venecia", "tipo": "Colonia", "cp": "95580", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "curazao", "colonia": "Curazao", "tipo": "Ejido", "cp": "95580", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el maguey", "colonia": "El Maguey", "tipo": "Ejido", "cp": "95580", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "villa azueta", "colonia": "Villa Azueta", "tipo": "Pueblo", "cp": "95580", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nueva", "colonia": "Nueva", "tipo": "Colonia", "cp": "95580", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "valle dorado", "colonia": "Valle Dorado", "tipo": "Colonia", "cp": "95580", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "veracrucito", "colonia": "Veracrucito", "tipo": "Pueblo", "cp": "95584", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "lindavista", "colonia": "Lindavista", "tipo": "Pueblo", "cp": "95585", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san luis", "colonia": "San Luis", "tipo": "Ejido", "cp": "95587", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san jer�nimo", "colonia": "San Jer�nimo", "tipo": "Pueblo", "cp": "95588", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "dobladero", "colonia": "Dobladero", "tipo": "Colonia", "cp": "95590", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "manzanillo", "colonia": "Manzanillo", "tipo": "Rancher�a", "cp": "95593", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "vicente guerrero (el aguacate)", "colonia": "Vicente Guerrero (El Aguacate)", "tipo": "Ejido", "cp": "95593", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "cujuliapan", "colonia": "Cujuliapan", "tipo": "Pueblo", "cp": "95594", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "tenejapan (tenejapan de mata)", "colonia": "Tenejapan (Tenejapan de Mata)", "tipo": "Pueblo", "cp": "95595", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "tesechoac�n", "colonia": "Tesechoac�n", "tipo": "Pueblo", "cp": "95595", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "pueblo nuevo", "colonia": "Pueblo Nuevo", "tipo": "Pueblo", "cp": "95597", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "jobo grande", "colonia": "Jobo Grande", "tipo": "Rancho", "cp": "95597", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "agua fr�a", "colonia": "Agua Fr�a", "tipo": "Rancher�a", "cp": "95597", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "las hojas", "colonia": "Las Hojas", "tipo": "Rancher�a", "cp": "95597", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la esperanza", "colonia": "La Esperanza", "tipo": "Pueblo", "cp": "95598", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "tres lagunas", "colonia": "Tres Lagunas", "tipo": "Ejido", "cp": "95598", "mun": "Jos� Azueta", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la soledad", "colonia": "La Soledad", "tipo": "Rancho", "cp": "95670", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "los villas (el penco)", "colonia": "Los Villas (El Penco)", "tipo": "Rancho", "cp": "95670", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "pedro maule�n", "colonia": "Pedro Maule�n", "tipo": "Rancho", "cp": "95670", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la uni�n", "colonia": "La Uni�n", "tipo": "Ejido", "cp": "95670", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "rinc�n chiquito", "colonia": "Rinc�n Chiquito", "tipo": "Rancho", "cp": "95672", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el jatillo (el hatillo)", "colonia": "El Jatillo (El Hatillo)", "tipo": "Ejido", "cp": "95672", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "teocalli", "colonia": "Teocalli", "tipo": "Rancho", "cp": "95673", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "palo miguel", "colonia": "Palo Miguel", "tipo": "Ejido", "cp": "95673", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "antonio m. quirasco", "colonia": "Antonio M. Quirasco", "tipo": "Ejido", "cp": "95673", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la isleta", "colonia": "La Isleta", "tipo": "Ejido", "cp": "95673", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el tular", "colonia": "El Tular", "tipo": "Ejido", "cp": "95673", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san benito", "colonia": "San Benito", "tipo": "Ejido", "cp": "95673", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "paso del ganado", "colonia": "Paso del Ganado", "tipo": "Ejido", "cp": "95673", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nuevo remolino (el cincuenta)", "colonia": "Nuevo Remolino (El Cincuenta)", "tipo": "Ejido", "cp": "95673", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "paso del ganado (la loma)", "colonia": "Paso del Ganado (La Loma)", "tipo": "Ejido", "cp": "95673", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "monte rosa", "colonia": "Monte Rosa", "tipo": "Ejido", "cp": "95673", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la asunci�n", "colonia": "La Asunci�n", "tipo": "Barrio", "cp": "95674", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "santa teresa", "colonia": "Santa Teresa", "tipo": "Barrio", "cp": "95674", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el blanco", "colonia": "El Blanco", "tipo": "Rancher�a", "cp": "95674", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nopalapan", "colonia": "Nopalapan", "tipo": "Pueblo", "cp": "95674", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la ca�ada", "colonia": "La Ca�ada", "tipo": "Ejido", "cp": "95674", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el ciruelo", "colonia": "El Ciruelo", "tipo": "Ejido", "cp": "95674", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "matilla de conejo", "colonia": "Matilla de Conejo", "tipo": "Ejido", "cp": "95674", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "las tuzas", "colonia": "Las Tuzas", "tipo": "Rancho", "cp": "95675", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el marquesillo", "colonia": "El Marquesillo", "tipo": "Rancher�a", "cp": "95675", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "loma de los changos", "colonia": "Loma de los Changos", "tipo": "Ejido", "cp": "95675", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "loma de hujuapan", "colonia": "Loma de Hujuapan", "tipo": "Ejido", "cp": "95675", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "casas viejas", "colonia": "Casas Viejas", "tipo": "Rancher�a", "cp": "95676", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "cerro del indio (mata verde)", "colonia": "Cerro del Indio (Mata Verde)", "tipo": "Ejido", "cp": "95676", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "ojo de agua", "colonia": "Ojo de Agua", "tipo": "Ejido", "cp": "95676", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la soledad", "colonia": "La Soledad", "tipo": "Ejido", "cp": "95676", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el ator�n", "colonia": "El Ator�n", "tipo": "Rancho", "cp": "95677", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "los dom�nguez", "colonia": "Los Dom�nguez", "tipo": "Rancho", "cp": "95677", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san mart�n", "colonia": "San Mart�n", "tipo": "Rancho", "cp": "95677", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "dom�nguez", "colonia": "Dom�nguez", "tipo": "Colonia", "cp": "95677", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el zorral", "colonia": "El Zorral", "tipo": "Ejido", "cp": "95677", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nueva esperanza", "colonia": "Nueva Esperanza", "tipo": "Ejido", "cp": "95677", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "vicente guerrero", "colonia": "Vicente Guerrero", "tipo": "Ejido", "cp": "95677", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "chacamaloya (pancho prieto)", "colonia": "Chacamaloya (Pancho Prieto)", "tipo": "Rancho", "cp": "95679", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "dos arbolitos", "colonia": "Dos Arbolitos", "tipo": "Rancho", "cp": "95679", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "los pe�a (la luisita)", "colonia": "Los Pe�a (La Luisita)", "tipo": "Rancho", "cp": "95679", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "las flores", "colonia": "Las Flores", "tipo": "Rancho", "cp": "95679", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la luisa", "colonia": "La Luisa", "tipo": "Ejido", "cp": "95679", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la luisa antigua", "colonia": "La Luisa Antigua", "tipo": "Ejido", "cp": "95679", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "la floreadora (la bodega)", "colonia": "La Floreadora (La Bodega)", "tipo": "Ejido", "cp": "95679", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "rancho nuevo", "colonia": "Rancho Nuevo", "tipo": "Rancho", "cp": "95680", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "pedro delgado", "colonia": "Pedro Delgado", "tipo": "Colonia", "cp": "95680", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "los tigres", "colonia": "Los Tigres", "tipo": "Ejido", "cp": "95680", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "jimba", "colonia": "Jimba", "tipo": "Ejido", "cp": "95680", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san antonio", "colonia": "San Antonio", "tipo": "Ejido", "cp": "95680", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "pablo l. sidar", "colonia": "Pablo L. Sidar", "tipo": "Ejido", "cp": "95680", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "nuevo paso novillo (libertad y progreso)", "colonia": "Nuevo Paso Novillo (Libertad y Progreso)", "tipo": "Ejido", "cp": "95680", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "alto lucero", "colonia": "Alto Lucero", "tipo": "Rancho", "cp": "95682", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el milagro (el cuchillo)", "colonia": "El Milagro (El Cuchillo)", "tipo": "Ejido", "cp": "95682", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "las canoas", "colonia": "Las Canoas", "tipo": "Ejido", "cp": "95682", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el porvenir", "colonia": "El Porvenir", "tipo": "Rancho", "cp": "95683", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "huayacanes", "colonia": "Huayacanes", "tipo": "Pueblo", "cp": "95683", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el coyolito", "colonia": "El Coyolito", "tipo": "Ejido", "cp": "95683", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "un rinc�n de santiago", "colonia": "Un Rinc�n de Santiago", "tipo": "Rancho", "cp": "95684", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "angostura", "colonia": "Angostura", "tipo": "Pueblo", "cp": "95684", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san pedro del llano", "colonia": "San Pedro del Llano", "tipo": "Ejido", "cp": "95684", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san jos� tulapan (san isidro)", "colonia": "San Jos� Tulapan (San Isidro)", "tipo": "Ejido", "cp": "95684", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san sebasti�n", "colonia": "San Sebasti�n", "tipo": "Ejido", "cp": "95684", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "cinco de mayo", "colonia": "Cinco de Mayo", "tipo": "Ejido", "cp": "95684", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "veinte de noviembre (pancho villa)", "colonia": "Veinte de Noviembre (Pancho Villa)", "tipo": "Colonia", "cp": "95685", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "independencia", "colonia": "Independencia", "tipo": "Ejido", "cp": "95685", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "miguel hidalgo", "colonia": "Miguel Hidalgo", "tipo": "Ejido", "cp": "95685", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el cedro (rancho alegre)", "colonia": "El Cedro (Rancho Alegre)", "tipo": "Ejido", "cp": "95685", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el mirador", "colonia": "El Mirador", "tipo": "Ejido", "cp": "95685", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "emiliano zapata", "colonia": "Emiliano Zapata", "tipo": "Pueblo", "cp": "95686", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el cafetal", "colonia": "El Cafetal", "tipo": "Ejido", "cp": "95686", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "san lorenzo", "colonia": "San Lorenzo", "tipo": "Ejido", "cp": "95686", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "paso lim�n", "colonia": "Paso Lim�n", "tipo": "Ejido", "cp": "95686", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "mata de ca�a", "colonia": "Mata de Ca�a", "tipo": "Ejido", "cp": "95686", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "santa rosa", "colonia": "Santa Rosa", "tipo": "Ejido", "cp": "95686", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "el milagro", "colonia": "El Milagro", "tipo": "Rancho", "cp": "95687", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "gloria de cuapa (cartagena)", "colonia": "Gloria de Cuapa (Cartagena)", "tipo": "Ejido", "cp": "95687", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "guadalupe castro moreno", "colonia": "Guadalupe Castro Moreno", "tipo": "Ejido", "cp": "95687", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": ""}, {"k": "juan rodriguez clara centro", "colonia": "Juan Rodriguez Clara Centro", "tipo": "Colonia", "cp": "95690", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Juan Rodr�guez Clara"}, {"k": "juana huerta (tierra colorada)", "colonia": "Juana Huerta (Tierra Colorada)", "tipo": "Colonia", "cp": "95693", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Juan Rodr�guez Clara"}, {"k": "benito ju�rez", "colonia": "Benito Ju�rez", "tipo": "Colonia", "cp": "95693", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Juan Rodr�guez Clara"}, {"k": "las mercedes", "colonia": "Las Mercedes", "tipo": "Colonia", "cp": "95694", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Juan Rodr�guez Clara"}, {"k": "feliciano ceballos", "colonia": "Feliciano Ceballos", "tipo": "Colonia", "cp": "95694", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Juan Rodr�guez Clara"}, {"k": "la bomba", "colonia": "La Bomba", "tipo": "Barrio", "cp": "95694", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Juan Rodr�guez Clara"}, {"k": "del pante�n", "colonia": "Del Pante�n", "tipo": "Barrio", "cp": "95694", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Juan Rodr�guez Clara"}, {"k": "mata bejuco", "colonia": "Mata Bejuco", "tipo": "Colonia", "cp": "95695", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Juan Rodr�guez Clara"}, {"k": "san pablo", "colonia": "San Pablo", "tipo": "Colonia", "cp": "95695", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Juan Rodr�guez Clara"}, {"k": "lomas del serrano", "colonia": "Lomas del Serrano", "tipo": "Colonia", "cp": "95695", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Juan Rodr�guez Clara"}, {"k": "d�az mir�n", "colonia": "D�az Mir�n", "tipo": "Colonia", "cp": "95696", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Juan Rodr�guez Clara"}, {"k": "alfonso rom�n", "colonia": "Alfonso Rom�n", "tipo": "Colonia", "cp": "95697", "mun": "Juan Rodr�guez Clara", "edo": "Veracruz de Ignacio de la Llave", "ciu": "Juan Rodr�guez Clara"}];
+const SEPOMEX_CP_INDEX = {"95640": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "Isla", "asentamientos": [{"tipo": "Colonia", "colonia": "Isla Centro"}]}, "95642": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "Isla", "asentamientos": [{"tipo": "Colonia", "colonia": "Cetis"}]}, "95643": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "Isla", "asentamientos": [{"tipo": "Colonia", "colonia": "El Para�so"}, {"tipo": "Colonia", "colonia": "Benito Ju�rez"}, {"tipo": "Colonia", "colonia": "L�zaro C�rdenas"}, {"tipo": "Colonia", "colonia": "San Jos�"}, {"tipo": "Colonia", "colonia": "San Juan de Dios"}]}, "95645": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "Isla", "asentamientos": [{"tipo": "Colonia", "colonia": "Emiliano Zapata"}, {"tipo": "Colonia", "colonia": "La Loma"}, {"tipo": "Colonia", "colonia": "Mariano Aguirre Uscanga"}, {"tipo": "Colonia", "colonia": "La Luz"}, {"tipo": "Colonia", "colonia": "Naranjo"}]}, "95646": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "Isla", "asentamientos": [{"tipo": "Colonia", "colonia": "La Gravera"}, {"tipo": "Colonia", "colonia": "Luis Donaldo Colosio"}]}, "95647": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "Isla", "asentamientos": [{"tipo": "Colonia", "colonia": "Chamizal"}, {"tipo": "Colonia", "colonia": "Agropista"}]}, "95648": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "Isla", "asentamientos": [{"tipo": "Colonia", "colonia": "Fernando L�pez Arias"}, {"tipo": "Colonia", "colonia": "Lim�n de Guerrero"}, {"tipo": "Colonia", "colonia": "Santa Fe"}, {"tipo": "Colonia", "colonia": "Obrera"}]}, "95650": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "San Sim�n II"}, {"tipo": "Rancher�a", "colonia": "San Sim�n Segundo (Las �guilas)"}, {"tipo": "Pueblo", "colonia": "San Nicol�s Zacapexco"}, {"tipo": "Rancher�a", "colonia": "El Chancarro"}, {"tipo": "Rancher�a", "colonia": "Nuevo Viloria"}, {"tipo": "Rancher�a", "colonia": "Las Tunas"}, {"tipo": "Rancher�a", "colonia": "Palmarillo"}]}, "95652": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "", "asentamientos": [{"tipo": "Barrio", "colonia": "Garro"}, {"tipo": "Rancher�a", "colonia": "El Nanche"}, {"tipo": "Rancher�a", "colonia": "Raudal"}, {"tipo": "Rancher�a", "colonia": "Vista Hermosa"}, {"tipo": "Rancher�a", "colonia": "Viloria Viejo"}]}, "95653": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "Las Hojas (Las Hojitas)"}]}, "95654": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "Montecristo"}, {"tipo": "Rancher�a", "colonia": "Las Playas"}, {"tipo": "Rancho", "colonia": "La Esmeralda"}, {"tipo": "Ejido", "colonia": "La Granja"}, {"tipo": "Barrio", "colonia": "Nuevo Cant�n"}, {"tipo": "Rancher�a", "colonia": "La Ca�ada"}, {"tipo": "Rancher�a", "colonia": "Agua Fr�a Uno"}, {"tipo": "Rancher�a", "colonia": "Rodolfo Fierro"}, {"tipo": "Rancher�a", "colonia": "Totoloche"}, {"tipo": "Colonia", "colonia": "San Anastacio (Tachic�n)"}, {"tipo": "Rancher�a", "colonia": "San Pablo Xalpa"}, {"tipo": "Rancher�a", "colonia": "San Pedro M�rtir"}, {"tipo": "Rancher�a", "colonia": "Licenciado Alfredo V. Bonfil"}, {"tipo": "Rancher�a", "colonia": "El Maguial (La Laguna)"}, {"tipo": "Rancher�a", "colonia": "Ignacio Ram�rez"}]}, "95655": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "Las Golondrinas"}, {"tipo": "Rancho", "colonia": "Los Dos Hermanos"}, {"tipo": "Rancho", "colonia": "El Para�so"}, {"tipo": "Rancho", "colonia": "El Paisaje"}, {"tipo": "Rancho", "colonia": "Cerro Colorado"}, {"tipo": "Pueblo", "colonia": "Palma de Oro"}, {"tipo": "Rancher�a", "colonia": "Chiltepec"}, {"tipo": "Rancher�a", "colonia": "El Pozon"}, {"tipo": "Rancher�a", "colonia": "Macuile"}, {"tipo": "Rancher�a", "colonia": "Loma Alta"}, {"tipo": "Rancher�a", "colonia": "Garza Blanca"}]}, "95657": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "La Pe�a"}, {"tipo": "Rancher�a", "colonia": "Francisco Villa"}, {"tipo": "Rancho", "colonia": "El Cedral (Palo Gacho)"}, {"tipo": "Ejido", "colonia": "Oro Verde (El Arenal)"}, {"tipo": "Rancher�a", "colonia": "San Luis"}, {"tipo": "Rancher�a", "colonia": "El Marcial (El Coyolar)"}, {"tipo": "Rancher�a", "colonia": "Santa Mar�a"}, {"tipo": "Rancher�a", "colonia": "Coapa"}, {"tipo": "Rancher�a", "colonia": "Las Garzas"}]}, "95658": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "San Ram�n"}, {"tipo": "Rancho", "colonia": "Rancho Nuevo"}, {"tipo": "Rancher�a", "colonia": "Mazoco"}, {"tipo": "Rancher�a", "colonia": "El Mosquito"}, {"tipo": "Rancher�a", "colonia": "Nuevo Potrero"}, {"tipo": "Rancher�a", "colonia": "El �ape"}, {"tipo": "Rancher�a", "colonia": "Cujuluapan (El Guayabo)"}, {"tipo": "Rancher�a", "colonia": "Mata Limones"}, {"tipo": "Rancher�a", "colonia": "Leyes de Reforma"}]}, "95659": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Isla", "ciudad": "", "asentamientos": [{"tipo": "Ejido", "colonia": "El Tesoro"}, {"tipo": "Rancher�a", "colonia": "Balboa"}, {"tipo": "Rancher�a", "colonia": "Potrerillos"}, {"tipo": "Rancher�a", "colonia": "Las Macayas"}, {"tipo": "Rancher�a", "colonia": "Palo Blanco"}, {"tipo": "Rancher�a", "colonia": "Solerilla"}, {"tipo": "Rancher�a", "colonia": "Las Cruces"}]}, "El Cat�logo Nacional de C�digos Postales, es elaborado por Correos de M�xico y se proporciona en forma gratuita para uso particular, no estando permitida su comercializaci�n, total o parcial, ni su distribuci�n a terceros bajo ning�n concepto.": {"estado": "nan", "municipio": "nan", "ciudad": "nan", "asentamientos": [{"tipo": "nan", "colonia": "nan"}, {"tipo": "nan", "colonia": "nan"}, {"tipo": "nan", "colonia": "nan"}]}, "C�digo Postal": {"estado": "Estado", "municipio": "Municipio", "ciudad": "Ciudad", "asentamientos": [{"tipo": "Tipo de Asentamiento", "colonia": "Asentamiento"}, {"tipo": "Tipo de Asentamiento", "colonia": "Asentamiento"}, {"tipo": "Tipo de Asentamiento", "colonia": "Asentamiento"}]}, "95600": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "Playa Vicente", "asentamientos": [{"tipo": "Colonia", "colonia": "El Pedregoso"}, {"tipo": "Colonia", "colonia": "Solidaridad"}, {"tipo": "Colonia", "colonia": "La Perla"}, {"tipo": "Colonia", "colonia": "Del Carmen"}, {"tipo": "Colonia", "colonia": "San Jos�"}, {"tipo": "Colonia", "colonia": "Las Limas"}, {"tipo": "Colonia", "colonia": "La Concepci�n"}, {"tipo": "Colonia", "colonia": "Chapultepec"}, {"tipo": "Colonia", "colonia": "La Florida"}, {"tipo": "Colonia", "colonia": "La Guadalupe"}, {"tipo": "Colonia", "colonia": "La Loma"}, {"tipo": "Colonia", "colonia": "Las Palmas"}, {"tipo": "Colonia", "colonia": "Playa Vicente Centro"}, {"tipo": "Colonia", "colonia": "Emiliano Zapata"}, {"tipo": "Colonia", "colonia": "Zorrillo"}, {"tipo": "Colonia", "colonia": "Lomas Verdes"}]}, "95603": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "Lealtad de Mu�oz"}, {"tipo": "Rancher�a", "colonia": "Miguel L�pez"}, {"tipo": "Pueblo", "colonia": "Mata de Ca�a"}, {"tipo": "Rancho", "colonia": "Monte Verde"}, {"tipo": "Colonia", "colonia": "Santa Elena"}, {"tipo": "Colonia", "colonia": "La Uni�n Juan Enr�quez"}, {"tipo": "Colonia", "colonia": "San Francisco"}, {"tipo": "Rancher�a", "colonia": "La Victoria"}, {"tipo": "Rancher�a", "colonia": "Arroyo Bermejo"}, {"tipo": "Rancher�a", "colonia": "El Ramie"}, {"tipo": "Pueblo", "colonia": "Juan Enr�quez"}]}, "95604": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "La Petronila"}, {"tipo": "Colonia", "colonia": "Arroyo Guadalupe la Palma"}, {"tipo": "Pueblo", "colonia": "Arroyo Colorado"}]}, "95605": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "San Ram�n Segundo"}, {"tipo": "Rancher�a", "colonia": "Ruiz Cortines Revoluci�n"}, {"tipo": "Rancher�a", "colonia": "Tierra Nueva"}, {"tipo": "Rancher�a", "colonia": "Nuevo Ojitl�n"}, {"tipo": "Colonia", "colonia": "Ed�n de las Flores"}, {"tipo": "Rancher�a", "colonia": "Carmen Arroyo del Gavil�n"}, {"tipo": "Rancher�a", "colonia": "Nuevo Arroyo Grande"}, {"tipo": "Rancher�a", "colonia": "Arroyo Dehesa"}, {"tipo": "Barrio", "colonia": "El Mirador"}]}, "95606": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "Rancho Grande"}, {"tipo": "Pueblo", "colonia": "Arroyo Seco"}, {"tipo": "Colonia", "colonia": "La Candelaria"}, {"tipo": "Colonia", "colonia": "La Reforma San Felipe"}, {"tipo": "Rancher�a", "colonia": "Loma de Piedra"}]}, "95607": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "Chilapa del Carmen"}, {"tipo": "Ejido", "colonia": "Arenal Santa Ana"}, {"tipo": "Pueblo", "colonia": "General Hermenegildo Galeana"}, {"tipo": "Pueblo", "colonia": "El Nigromante"}]}, "95609": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "La Sabana Carame"}, {"tipo": "Pueblo", "colonia": "El Zapotal"}, {"tipo": "Colonia", "colonia": "Piedra de Cal"}, {"tipo": "Colonia", "colonia": "Ampliaci�n Chilapa"}, {"tipo": "Rancher�a", "colonia": "�lvaro Obreg�n"}, {"tipo": "Pueblo", "colonia": "San Jos� Chilapa"}]}, "95614": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "El Serrano"}, {"tipo": "Colonia", "colonia": "San Felipe Zapotal"}, {"tipo": "Colonia", "colonia": "Benito Ju�rez"}]}, "95618": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "Arroyo Zacate"}, {"tipo": "Pueblo", "colonia": "Tomatillo"}, {"tipo": "Ejido", "colonia": "La Nueva Era"}, {"tipo": "Ejido", "colonia": "Santa Rosa"}]}, "95619": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Colonia", "colonia": "San Gabriel"}, {"tipo": "Rancher�a", "colonia": "La Loma"}, {"tipo": "Rancher�a", "colonia": "La Florencia"}, {"tipo": "Colonia", "colonia": "Lindavista"}, {"tipo": "Rancher�a", "colonia": "Zanja de Ca�a"}, {"tipo": "Ejido", "colonia": "Tomate R�o Manso"}]}, "95620": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "Cuauht�moc"}, {"tipo": "Rancher�a", "colonia": "Plan Bonito"}, {"tipo": "Pueblo", "colonia": "Abasolo Del Valle"}]}, "95622": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Rancher�a", "colonia": "El Torito"}]}, "95623": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "San Isidro"}, {"tipo": "Rancho", "colonia": "El Naranjo"}, {"tipo": "Rancho", "colonia": "�rsulo Galv�n (La Primavera)"}, {"tipo": "Pueblo", "colonia": "Arroyo San Pedro"}, {"tipo": "Rancher�a", "colonia": "Vicente Guerrero"}]}, "95624": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Ejido", "colonia": "El Vergel"}]}, "95625": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Rancher�a", "colonia": "General Guadalupe Victoria"}]}, "95626": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Rancher�a", "colonia": "Coahuila"}]}, "95627": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Colonia", "colonia": "Nuevo Pescadito de Arriba"}, {"tipo": "Rancher�a", "colonia": "Nuevo Arroyo del Tigre"}, {"tipo": "Pueblo", "colonia": "Nuevo San Mart�n"}]}, "95628": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "Nuevo Raya Caracol (Zanja Seca)"}, {"tipo": "Rancho", "colonia": "Vega del Joval"}, {"tipo": "Pueblo", "colonia": "Nuevo Cosolapa Sarmiento"}, {"tipo": "Colonia", "colonia": "Arroyo Le�n"}, {"tipo": "Rancher�a", "colonia": "Palma Sola"}, {"tipo": "Ejido", "colonia": "Nuevo Ixcatlan"}]}, "95629": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Playa Vicente", "ciudad": "", "asentamientos": [{"tipo": "Rancher�a", "colonia": "Agua Fr�a Nazareno"}, {"tipo": "Rancher�a", "colonia": "Andr�s G�mez Alem�n"}]}, "95580": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Jos� Azueta", "ciudad": "", "asentamientos": [{"tipo": "Colonia", "colonia": "Rub�n R. Jaramillo"}, {"tipo": "Colonia", "colonia": "Del Bosque"}, {"tipo": "Colonia", "colonia": "Tejeda"}, {"tipo": "Colonia", "colonia": "V�zquez Vela"}, {"tipo": "Colonia", "colonia": "Venecia"}, {"tipo": "Ejido", "colonia": "Curazao"}, {"tipo": "Ejido", "colonia": "El Maguey"}, {"tipo": "Pueblo", "colonia": "Villa Azueta"}, {"tipo": "Colonia", "colonia": "Nueva"}, {"tipo": "Colonia", "colonia": "Valle Dorado"}]}, "95584": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Jos� Azueta", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "Veracrucito"}]}, "95585": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Jos� Azueta", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "Lindavista"}]}, "95587": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Jos� Azueta", "ciudad": "", "asentamientos": [{"tipo": "Ejido", "colonia": "San Luis"}]}, "95588": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Jos� Azueta", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "San Jer�nimo"}]}, "95590": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Jos� Azueta", "ciudad": "", "asentamientos": [{"tipo": "Colonia", "colonia": "Dobladero"}]}, "95593": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Jos� Azueta", "ciudad": "", "asentamientos": [{"tipo": "Rancher�a", "colonia": "Manzanillo"}, {"tipo": "Ejido", "colonia": "Vicente Guerrero (El Aguacate)"}]}, "95594": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Jos� Azueta", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "Cujuliapan"}]}, "95595": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Jos� Azueta", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "Tenejapan (Tenejapan de Mata)"}, {"tipo": "Pueblo", "colonia": "Tesechoac�n"}]}, "95597": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Jos� Azueta", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "Pueblo Nuevo"}, {"tipo": "Rancho", "colonia": "Jobo Grande"}, {"tipo": "Rancher�a", "colonia": "Agua Fr�a"}, {"tipo": "Rancher�a", "colonia": "Las Hojas"}]}, "95598": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Jos� Azueta", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "La Esperanza"}, {"tipo": "Ejido", "colonia": "Tres Lagunas"}]}, "95670": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "La Soledad"}, {"tipo": "Rancho", "colonia": "Los Villas (El Penco)"}, {"tipo": "Rancho", "colonia": "Pedro Maule�n"}, {"tipo": "Ejido", "colonia": "La Uni�n"}]}, "95672": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "Rinc�n Chiquito"}, {"tipo": "Ejido", "colonia": "El Jatillo (El Hatillo)"}]}, "95673": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "Teocalli"}, {"tipo": "Ejido", "colonia": "Palo Miguel"}, {"tipo": "Ejido", "colonia": "Antonio M. Quirasco"}, {"tipo": "Ejido", "colonia": "La Isleta"}, {"tipo": "Ejido", "colonia": "El Tular"}, {"tipo": "Ejido", "colonia": "San Benito"}, {"tipo": "Ejido", "colonia": "Paso del Ganado"}, {"tipo": "Ejido", "colonia": "Nuevo Remolino (El Cincuenta)"}, {"tipo": "Ejido", "colonia": "Paso del Ganado (La Loma)"}, {"tipo": "Ejido", "colonia": "Monte Rosa"}]}, "95674": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Barrio", "colonia": "La Asunci�n"}, {"tipo": "Barrio", "colonia": "Santa Teresa"}, {"tipo": "Rancher�a", "colonia": "El Blanco"}, {"tipo": "Pueblo", "colonia": "Nopalapan"}, {"tipo": "Ejido", "colonia": "La Ca�ada"}, {"tipo": "Ejido", "colonia": "El Ciruelo"}, {"tipo": "Ejido", "colonia": "Matilla de Conejo"}]}, "95675": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "Las Tuzas"}, {"tipo": "Rancher�a", "colonia": "El Marquesillo"}, {"tipo": "Ejido", "colonia": "Loma de los Changos"}, {"tipo": "Ejido", "colonia": "Loma de Hujuapan"}]}, "95676": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Rancher�a", "colonia": "Casas Viejas"}, {"tipo": "Ejido", "colonia": "Cerro del Indio (Mata Verde)"}, {"tipo": "Ejido", "colonia": "Ojo de Agua"}, {"tipo": "Ejido", "colonia": "La Soledad"}]}, "95677": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "El Ator�n"}, {"tipo": "Rancho", "colonia": "Los Dom�nguez"}, {"tipo": "Rancho", "colonia": "San Mart�n"}, {"tipo": "Colonia", "colonia": "Dom�nguez"}, {"tipo": "Ejido", "colonia": "El Zorral"}, {"tipo": "Ejido", "colonia": "Nueva Esperanza"}, {"tipo": "Ejido", "colonia": "Vicente Guerrero"}]}, "95679": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "Chacamaloya (Pancho Prieto)"}, {"tipo": "Rancho", "colonia": "Dos Arbolitos"}, {"tipo": "Rancho", "colonia": "Los Pe�a (La Luisita)"}, {"tipo": "Rancho", "colonia": "Las Flores"}, {"tipo": "Ejido", "colonia": "La Luisa"}, {"tipo": "Ejido", "colonia": "La Luisa Antigua"}, {"tipo": "Ejido", "colonia": "La Floreadora (La Bodega)"}]}, "95680": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "Rancho Nuevo"}, {"tipo": "Colonia", "colonia": "Pedro Delgado"}, {"tipo": "Ejido", "colonia": "Los Tigres"}, {"tipo": "Ejido", "colonia": "Jimba"}, {"tipo": "Ejido", "colonia": "San Antonio"}, {"tipo": "Ejido", "colonia": "Pablo L. Sidar"}, {"tipo": "Ejido", "colonia": "Nuevo Paso Novillo (Libertad y Progreso)"}]}, "95682": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "Alto Lucero"}, {"tipo": "Ejido", "colonia": "El Milagro (El Cuchillo)"}, {"tipo": "Ejido", "colonia": "Las Canoas"}]}, "95683": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "El Porvenir"}, {"tipo": "Pueblo", "colonia": "Huayacanes"}, {"tipo": "Ejido", "colonia": "El Coyolito"}]}, "95684": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "Un Rinc�n de Santiago"}, {"tipo": "Pueblo", "colonia": "Angostura"}, {"tipo": "Ejido", "colonia": "San Pedro del Llano"}, {"tipo": "Ejido", "colonia": "San Jos� Tulapan (San Isidro)"}, {"tipo": "Ejido", "colonia": "San Sebasti�n"}, {"tipo": "Ejido", "colonia": "Cinco de Mayo"}]}, "95685": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Colonia", "colonia": "Veinte de Noviembre (Pancho Villa)"}, {"tipo": "Ejido", "colonia": "Independencia"}, {"tipo": "Ejido", "colonia": "Miguel Hidalgo"}, {"tipo": "Ejido", "colonia": "El Cedro (Rancho Alegre)"}, {"tipo": "Ejido", "colonia": "El Mirador"}]}, "95686": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Pueblo", "colonia": "Emiliano Zapata"}, {"tipo": "Ejido", "colonia": "El Cafetal"}, {"tipo": "Ejido", "colonia": "San Lorenzo"}, {"tipo": "Ejido", "colonia": "Paso Lim�n"}, {"tipo": "Ejido", "colonia": "Mata de Ca�a"}, {"tipo": "Ejido", "colonia": "Santa Rosa"}]}, "95687": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "", "asentamientos": [{"tipo": "Rancho", "colonia": "El Milagro"}, {"tipo": "Ejido", "colonia": "Gloria de Cuapa (Cartagena)"}, {"tipo": "Ejido", "colonia": "Guadalupe Castro Moreno"}]}, "95690": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "Juan Rodr�guez Clara", "asentamientos": [{"tipo": "Colonia", "colonia": "Juan Rodriguez Clara Centro"}]}, "95693": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "Juan Rodr�guez Clara", "asentamientos": [{"tipo": "Colonia", "colonia": "Juana Huerta (Tierra Colorada)"}, {"tipo": "Colonia", "colonia": "Benito Ju�rez"}]}, "95694": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "Juan Rodr�guez Clara", "asentamientos": [{"tipo": "Colonia", "colonia": "Las Mercedes"}, {"tipo": "Colonia", "colonia": "Feliciano Ceballos"}, {"tipo": "Barrio", "colonia": "La Bomba"}, {"tipo": "Barrio", "colonia": "Del Pante�n"}]}, "95695": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "Juan Rodr�guez Clara", "asentamientos": [{"tipo": "Colonia", "colonia": "Mata Bejuco"}, {"tipo": "Colonia", "colonia": "San Pablo"}, {"tipo": "Colonia", "colonia": "Lomas del Serrano"}]}, "95696": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "Juan Rodr�guez Clara", "asentamientos": [{"tipo": "Colonia", "colonia": "D�az Mir�n"}]}, "95697": {"estado": "Veracruz de Ignacio de la Llave", "municipio": "Juan Rodr�guez Clara", "ciudad": "Juan Rodr�guez Clara", "asentamientos": [{"tipo": "Colonia", "colonia": "Alfonso Rom�n"}]}};
+const OFICIOS = [{"k": "agencia de inhumaciones", "codigo": "8943012", "desc": "AGENCIA DE INHUMACIONES", "cat": "SERVICIOS"}, {"k": "agencia de mudanzas", "codigo": "7122013", "desc": "AGENCIA DE MUDANZAS", "cat": "TRANSPORTE, CORREOS, ALMACENAMIENTO"}, {"k": "agencia de publicidad", "codigo": "8422016", "desc": "AGENCIA DE PUBLICIDAD", "cat": "SERVICIOS"}, {"k": "agencia de turismo", "codigo": "7512016", "desc": "AGENCIA DE TURISMO", "cat": "SERVICIOS"}, {"k": "agencias de rifas y sorteos (quinielas y loteria)", "codigo": "6992011", "desc": "AGENCIAS DE RIFAS Y SORTEOS (QUINIELAS Y LOTERÍA)", "cat": "ESTABLECIMIENTOS"}, {"k": "alquiler de equipos electronicos", "codigo": "8523012", "desc": "ALQUILER DE EQUIPOS ELECTRÓNICOS", "cat": "ALQUILER O RENTA"}, {"k": "alquiler de sillas y vajillas para banquetes", "codigo": "8522014", "desc": "ALQUILER DE SILLAS Y VAJILLAS PARA BANQUETES", "cat": "ALQUILER O RENTA"}, {"k": "alquiler o renta de autos sin chofer", "codigo": "8524010", "desc": "ALQUILER O RENTA DE AUTOS SIN CHOFER", "cat": "ALQUILER O RENTA"}, {"k": "arrendamiento de equipo para procesamiento electronico", "codigo": "8512015", "desc": "ARRENDAMIENTO DE EQUIPO PARA PROCESAMIENTO ELECTRÓNICO", "cat": "ALQUILER O RENTA"}, {"k": "arrendamiento de inmuebles residenciales", "codigo": "8312019", "desc": "ARRENDAMIENTO DE INMUEBLES RESIDENCIALES", "cat": "ALQUILER O RENTA"}, {"k": "autotransporte escolar turistico en autobus y otro", "codigo": "7119010", "desc": "AUTOTRANSPORTE ESCOLAR TURÍSTICO EN AUTOBUS Y OTRO", "cat": "TRANSPORTE, CORREOS, ALMACENAMIENTO"}, {"k": "barberia y peluqueria", "codigo": "8932015", "desc": "BARBERÍA Y PELUQUERÍA", "cat": "SERVICIOS"}, {"k": "banos", "codigo": "8931017", "desc": "BAÑOS", "cat": "SERVICIOS"}, {"k": "cafeteria", "codigo": "8711013", "desc": "CAFETERÍA", "cat": "ESTABLECIMIENTOS"}, {"k": "casa de huespedes", "codigo": "8619019", "desc": "CASA DE HUÉSPEDES", "cat": "ALQUILER O RENTA"}, {"k": "compra venta articulos de cristal loza y porcelana", "codigo": "6321012", "desc": "COMPRA VENTA ARTÍCULOS DE CRISTAL LOZA Y PORCELANA", "cat": "COMPRA VENTA"}, {"k": "compra venta articulos de merceria y sederia", "codigo": "6215017", "desc": "COMPRA VENTA ARTÍCULOS DE MERCERÍA Y SEDERÍA", "cat": "COMPRA VENTA"}, {"k": "compra venta articulos regionales y curiosidades", "codigo": "6325048", "desc": "COMPRA VENTA ARTÍCULOS REGIONALES Y CURIOSIDADES", "cat": "COMPRA VENTA"}, {"k": "compra venta de algodon", "codigo": "6611017", "desc": "COMPRA VENTA DE ALGODÓN", "cat": "COMPRA VENTA"}, {"k": "compra venta de alimento para ganado", "codigo": "6133011", "desc": "COMPRA VENTA DE ALIMENTO PARA GANADO", "cat": "COMPRA VENTA"}, {"k": "compra venta de antiguedades", "codigo": "6325014", "desc": "COMPRA VENTA DE ANTIGÜEDADES", "cat": "COMPRA VENTA"}, {"k": "compra venta de articulos de boneteria", "codigo": "6215025", "desc": "COMPRA VENTA DE ARTÍCULOS DE BONETERÍA", "cat": "COMPRA VENTA"}, {"k": "compra venta de articulos de ferreteria", "codigo": "6622022", "desc": "COMPRA VENTA DE ARTÍCULOS DE FERRETERÍA", "cat": "COMPRA VENTA"}, {"k": "compra venta de articulos de plata", "codigo": "6225016", "desc": "COMPRA VENTA DE ARTÍCULOS DE PLATA", "cat": "COMPRA VENTA"}, {"k": "compra venta de articulos de talabarteria", "codigo": "6226014", "desc": "COMPRA VENTA DE ARTÍCULOS DE TALABARTERÍA", "cat": "COMPRA VENTA"}, {"k": "compra venta de articulos de tlapaleria", "codigo": "6626024", "desc": "COMPRA VENTA DE ARTÍCULOS DE TLAPALERÍA", "cat": "COMPRA VENTA"}, {"k": "compra venta de articulos de optica", "codigo": "6222012", "desc": "COMPRA VENTA DE ARTÍCULOS DE ÓPTICA", "cat": "COMPRA VENTA"}, {"k": "compra venta de articulos para decoracion", "codigo": "6322010", "desc": "COMPRA VENTA DE ARTÍCULOS PARA DECORACIÓN", "cat": "COMPRA VENTA"}, {"k": "compra venta de articulos para deporte", "codigo": "6221014", "desc": "COMPRA VENTA DE ARTÍCULOS PARA DEPORTE", "cat": "COMPRA VENTA"}, {"k": "compra venta de articulos para regalo", "codigo": "6325030", "desc": "COMPRA VENTA DE ARTÍCULOS PARA REGALO", "cat": "COMPRA VENTA"}, {"k": "compra venta de aves en pie", "codigo": "6121016", "desc": "COMPRA VENTA DE AVES EN PIE", "cat": "COMPRA VENTA (ANIMALES)"}, {"k": "compra venta de calzado", "codigo": "6212013", "desc": "COMPRA VENTA DE CALZADO", "cat": "COMPRA VENTA"}, {"k": "compra venta de carbon y otros combustibles", "codigo": "6519013", "desc": "COMPRA VENTA DE CARBÓN Y OTROS COMBUSTIBLES", "cat": "COMPRA VENTA"}, {"k": "compra venta de carne de aves", "codigo": "6124010", "desc": "COMPRA VENTA DE CARNE DE AVES", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta de carne de res y otras especies", "codigo": "6122014", "desc": "COMPRA VENTA DE CARNE DE RES Y OTRAS ESPECIES", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta de casimires", "codigo": "6216015", "desc": "COMPRA VENTA DE CASIMIRES", "cat": "COMPRA VENTA"}, {"k": "compra venta de ceras y parafinas", "codigo": "6699013", "desc": "COMPRA VENTA DE CERAS Y PARAFINAS", "cat": "COMPRA VENTA"}, {"k": "compra venta de chile s y especias", "codigo": "6113013", "desc": "COMPRA VENTA DE CHILE S Y ESPECIAS", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta de costales y bolsas", "codigo": "6626032", "desc": "COMPRA VENTA DE COSTALES Y BOLSAS", "cat": "COMPRA VENTA"}, {"k": "compra venta de desperdicios de papel", "codigo": "6693015", "desc": "COMPRA VENTA DE DESPERDICIOS DE PAPEL", "cat": "COMPRA VENTA"}, {"k": "compra venta de dulces", "codigo": "6132013", "desc": "COMPRA VENTA DE DULCES", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta de fertilizantes y plaguicidas", "codigo": "6691019", "desc": "COMPRA VENTA DE FERTILIZANTES Y PLAGUICIDAS", "cat": "COMPRA VENTA"}, {"k": "compra venta de fierro laminado y en lingotes", "codigo": "6622014", "desc": "COMPRA VENTA DE FIERRO LAMINADO Y EN LINGOTES", "cat": "COMPRA VENTA"}, {"k": "compra venta de fierro usado", "codigo": "6694013", "desc": "COMPRA VENTA DE FIERRO USADO", "cat": "COMPRA VENTA"}, {"k": "compra venta de flores y adornos florales artificiales", "codigo": "6326012", "desc": "COMPRA VENTA DE FLORES Y ADORNOS FLORALES ARTIFICIALES", "cat": "COMPRA VENTA"}, {"k": "compra venta de flores y adornos florales naturales", "codigo": "6326020", "desc": "COMPRA VENTA DE FLORES Y ADORNOS FLORALES NATURALES", "cat": "COMPRA VENTA"}, {"k": "compra venta de frutas", "codigo": "6112015", "desc": "COMPRA VENTA DE FRUTAS", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta de ganado mayor en pie", "codigo": "6121024", "desc": "COMPRA VENTA DE GANADO MAYOR EN PIE", "cat": "COMPRA VENTA (ANIMALES)"}, {"k": "compra venta de ganado menor en pie", "codigo": "6121032", "desc": "COMPRA VENTA DE GANADO MENOR EN PIE", "cat": "COMPRA VENTA (ANIMALES)"}, {"k": "compra venta de huevo", "codigo": "6125018", "desc": "COMPRA VENTA DE HUEVO", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta de juguetes", "codigo": "6223010", "desc": "COMPRA VENTA DE JUGUETES", "cat": "COMPRA VENTA"}, {"k": "compra venta de leche", "codigo": "6132039", "desc": "COMPRA VENTA DE LECHE", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta de legumbres y hortaliza", "codigo": "6112023", "desc": "COMPRA VENTA DE LEGUMBRES Y HORTALIZA", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta de libros", "codigo": "6227012", "desc": "COMPRA VENTA DE LIBROS", "cat": "COMPRA VENTA"}, {"k": "compra venta de lubricantes", "codigo": "6515011", "desc": "COMPRA VENTA DE LUBRICANTES", "cat": "COMPRA VENTA"}, {"k": "compra venta de materiales para construccion", "codigo": "6629010", "desc": "COMPRA VENTA DE MATERIALES PARA CONSTRUCCIÓN", "cat": "COMPRA VENTA"}, {"k": "compra venta de materias primas animales", "codigo": "6126024", "desc": "COMPRA VENTA DE MATERIAS PRIMAS ANIMALES", "cat": "COMPRA VENTA"}, {"k": "compra venta de muebles", "codigo": "6312011", "desc": "COMPRA VENTA DE MUEBLES", "cat": "COMPRA VENTA"}, {"k": "compra venta de muebles y articulos de oficina", "codigo": "6721022", "desc": "COMPRA VENTA DE MUEBLES Y ARTÍCULOS DE OFICINA", "cat": "COMPRA VENTA"}, {"k": "compra venta de otras fibras comerciales", "codigo": "6619045", "desc": "COMPRA VENTA DE OTRAS FIBRAS COMERCIALES", "cat": "COMPRA VENTA"}, {"k": "compra venta de otras joyas", "codigo": "6225024", "desc": "COMPRA VENTA DE OTRAS JOYAS", "cat": "COMPRA VENTA"}, {"k": "compra venta de otros articulos de plastico", "codigo": "6999041", "desc": "COMPRA VENTA DE OTROS ARTÍCULOS DE PLÁSTICO", "cat": "COMPRA VENTA"}, {"k": "compra venta de otros articulos para hogar", "codigo": "6329016", "desc": "COMPRA VENTA DE OTROS ARTÍCULOS PARA HOGAR", "cat": "COMPRA VENTA"}, {"k": "compra venta de otros productos de hule", "codigo": "6999067", "desc": "COMPRA VENTA DE OTROS PRODUCTOS DE HULE", "cat": "COMPRA VENTA"}, {"k": "compra venta de otros productos lacteos", "codigo": "6132047", "desc": "COMPRA VENTA DE OTROS PRODUCTOS LÁCTEOS", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta de otros productos textiles", "codigo": "6216023", "desc": "COMPRA VENTA DE OTROS PRODUCTOS TEXTILES", "cat": "COMPRA VENTA"}, {"k": "compra venta de pan y pasteles", "codigo": "6132055", "desc": "COMPRA VENTA DE PAN Y PASTELES", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta de papeleria y articulos de escritorio", "codigo": "6233019", "desc": "COMPRA VENTA DE PAPELERIA Y ARTÍCULOS DE ESCRITORIO", "cat": "COMPRA VENTA"}, {"k": "compra venta de partes y refacciones para vehiculos", "codigo": "6819017", "desc": "COMPRA VENTA DE PARTES Y REFACCIONES PARA VEHICULOS", "cat": "FABRICACIÓN Y COMPRA-VENTA"}, {"k": "compra venta de pescados y mariscos", "codigo": "6126032", "desc": "COMPRA VENTA DE PESCADOS Y MARISCOS", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta de pinturas barnices y brochas", "codigo": "6623020", "desc": "COMPRA VENTA DE PINTURAS BARNICES Y BROCHAS", "cat": "COMPRA VENTA"}, {"k": "compra venta de productos veterinarios", "codigo": "6993019", "desc": "COMPRA VENTA DE PRODUCTOS VETERINARIOS", "cat": "COMPRA VENTA"}, {"k": "compra venta de refacciones y accesorios nuevos", "codigo": "6815015", "desc": "COMPRA VENTA DE REFACCIONES Y ACCESORIOS NUEVOS", "cat": "COMPRA VENTA"}, {"k": "compra venta de refrescos aguas gaseosas y aguas", "codigo": "6134019", "desc": "COMPRA VENTA DE REFRESCOS AGUAS GASEOSAS Y AGUAS", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta de relojes", "codigo": "6225032", "desc": "COMPRA VENTA DE RELOJES", "cat": "COMPRA VENTA"}, {"k": "compra venta de ropa (se agregara nota de ropa nueva y nacional)", "codigo": "6211023", "desc": "COMPRA VENTA DE ROPA (Se agregará nota de ropa nueva y nacional)", "cat": "COMPRA VENTA"}, {"k": "compra venta de semillas para siembra", "codigo": "6612015", "desc": "COMPRA VENTA DE SEMILLAS PARA SIEMBRA", "cat": "COMPRA VENTA"}, {"k": "compra venta de semillas y granos", "codigo": "6111017", "desc": "COMPRA VENTA DE SEMILLAS Y GRANOS", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta de tapetes y alfombras", "codigo": "6322028", "desc": "COMPRA VENTA DE TAPETES Y ALFOMBRAS", "cat": "COMPRA VENTA"}, {"k": "compra venta de telas", "codigo": "6216031", "desc": "COMPRA VENTA DE TELAS", "cat": "COMPRA VENTA"}, {"k": "compra venta de velas y veladoras", "codigo": "6999075", "desc": "COMPRA VENTA DE VELAS Y VELADORAS", "cat": "COMPRA VENTA"}, {"k": "compra venta de vidrios, cristales y emplomados", "codigo": "6625018", "desc": "COMPRA VENTA DE VIDRIOS, CRISTALES Y EMPLOMADOS", "cat": "COMPRA VENTA"}, {"k": "compra venta especias y articulos alimenticios", "codigo": "6132021", "desc": "COMPRA VENTA ESPECIAS Y ARTÍCULOS ALIMENTICIOS", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compra venta gas de uso domestico o comercial", "codigo": "6512017", "desc": "COMPRA VENTA GAS DE USO DOMÉSTICO O COMERCIAL", "cat": "COMPRA VENTA"}, {"k": "compra venta instrumentos y articulos musicales", "codigo": "6224018", "desc": "COMPRA VENTA INSTRUMENTOS Y ARTÍCULOS MUSICALES", "cat": "COMPRA VENTA"}, {"k": "compra venta otras materias primas vegetales", "codigo": "6619037", "desc": "COMPRA VENTA OTRAS MATERIAS PRIMAS VEGETALES", "cat": "COMPRA VENTA"}, {"k": "compra venta otros productos alimenticios agricolas", "codigo": "6119011", "desc": "COMPRA VENTA OTROS PRODUCTOS ALIMENTICIOS AGRICOLAS", "cat": "COMPRA VENTA (ALIMENTOS)"}, {"k": "compraventa de alimentos y bebidas para aves y otros animales", "codigo": "6133029", "desc": "COMPRAVENTA DE ALIMENTOS Y BEBIDAS PARA AVES Y OTROS ANIMALES", "cat": "COMPRA VENTA"}, {"k": "congeladora de productos marinos", "codigo": "2061018", "desc": "CONGELADORA DE PRODUCTOS MARINOS", "cat": "EMPACADORA O EMBOTELLADORA"}, {"k": "construccion de casas y techos", "codigo": "4111019", "desc": "CONSTRUCCIÓN DE CASAS Y TECHOS", "cat": "CONSTRUCCIÓN"}, {"k": "construccion de edificios industriales", "codigo": "4113015", "desc": "CONSTRUCCIÓN DE EDIFICIOS INDUSTRIALES", "cat": "CONSTRUCCIÓN"}, {"k": "construccion de edificios para oficinas escuelas", "codigo": "4112017", "desc": "CONSTRUCCIÓN DE EDIFICIOS PARA OFICINAS ESCUELAS", "cat": "CONSTRUCCIÓN"}, {"k": "construccion de inmuebles", "codigo": "4111027", "desc": "CONSTRUCCIÓN DE INMUEBLES", "cat": "CONSTRUCCIÓN"}, {"k": "construccion de vivienda residencial", "codigo": "4111944", "desc": "CONSTRUCCIÓN DE VIVIENDA RESIDENCIAL", "cat": "CONSTRUCCIÓN"}, {"k": "construccion de vivienda tipo medio", "codigo": "4111928", "desc": "CONSTRUCCIÓN DE VIVIENDA TIPO MEDIO", "cat": "CONSTRUCCIÓN"}, {"k": "cria de gallinas para produccion de huevos", "codigo": "231019", "desc": "CRÍA DE GALLINAS PARA PRODUCCIÓN DE HUEVOS", "cat": "FABRICACIÓN / Animales, cria y explotación"}, {"k": "cria de ganado caballar", "codigo": "214015", "desc": "CRÍA DE GANADO CABALLAR", "cat": "FABRICACIÓN / Animales, cria y explotación"}, {"k": "cria de ganado de lidia", "codigo": "213017", "desc": "CRÍA DE GANADO DE LIDIA", "cat": "FABRICACIÓN / Animales, cria y explotación"}, {"k": "cria de ganado vacuno para carne", "codigo": "211011", "desc": "CRÍA DE GANADO VACUNO PARA CARNE", "cat": "FABRICACIÓN / Animales, cria y explotación"}, {"k": "cria de ganado vacuno para leche", "codigo": "212019", "desc": "CRÍA DE GANADO VACUNO PARA LECHE", "cat": "FABRICACIÓN / Animales, cria y explotación"}, {"k": "cria de otros equinos y ganado para trabajo", "codigo": "219015", "desc": "CRÍA DE OTROS EQUINOS Y GANADO PARA TRABAJO", "cat": "FABRICACIÓN / Animales, cria y explotación"}, {"k": "cria explotacion de conejos y liebre", "codigo": "251017", "desc": "CRÍA EXPLOTACIÓN DE CONEJOS Y LIEBRE", "cat": "FABRICACIÓN / Animales, cria y explotación"}, {"k": "cria y explotacion", "codigo": "259011", "desc": "CRÍA Y EXPLOTACIÓN", "cat": "FABRICACIÓN / Animales, cria y explotación"}, {"k": "cria y explotacion de ganado caprino", "codigo": "223016", "desc": "CRÍA Y EXPLOTACIÓN DE GANADO CAPRINO", "cat": "FABRICACIÓN / Animales, cria y explotación"}, {"k": "cria y explotacion de ganado ovino", "codigo": "222018", "desc": "CRÍA Y EXPLOTACIÓN DE GANADO OVINO", "cat": "FABRICACIÓN / Animales, cria y explotación"}, {"k": "cria y explotacion de ganado porcino", "codigo": "221010", "desc": "CRÍA Y EXPLOTACIÓN DE GANADO PORCINO", "cat": "FABRICACIÓN / Animales, cria y explotación"}, {"k": "cria y explotacion de pollos", "codigo": "232017", "desc": "CRÍA Y EXPLOTACIÓN DE POLLOS", "cat": "FABRICACIÓN / Animales, cria y explotación"}, {"k": "cria y explotacion otras aves para alimentacion", "codigo": "233015", "desc": "CRÍA Y EXPLOTACIÓN OTRAS AVES PARA ALIMENTACION", "cat": "FABRICACIÓN / Animales, cria y explotación"}, {"k": "cultivo de arroz", "codigo": "111021", "desc": "CULTIVO DE ARROZ", "cat": "CULTIVO"}, {"k": "cultivo de chile", "codigo": "112053", "desc": "CULTIVO DE CHILE", "cat": "CULTIVO"}, {"k": "cultivo de especias", "codigo": "129016", "desc": "CULTIVO DE ESPECIAS", "cat": "CULTIVO"}, {"k": "cultivo de flores y plantas de ornato", "codigo": "131011", "desc": "CULTIVO DE FLORES Y PLANTAS DE ORNATO", "cat": "CULTIVO"}, {"k": "cultivo de frijol", "codigo": "112079", "desc": "CULTIVO DE FRIJOL", "cat": "CULTIVO"}, {"k": "cultivo de otras hortalizas", "codigo": "112128", "desc": "CULTIVO DE OTRAS HORTALIZAS", "cat": "CULTIVO"}, {"k": "cultivo de otras semillas", "codigo": "129024", "desc": "CULTIVO DE OTRAS SEMILLAS", "cat": "CULTIVO"}, {"k": "cultivo de otros arboles frutales", "codigo": "142084", "desc": "CULTIVO DE OTROS ARBOLES FRUTALES", "cat": "CULTIVO"}, {"k": "cultivo de semillas mejoradas", "codigo": "129032", "desc": "CULTIVO DE SEMILLAS MEJORADAS", "cat": "CULTIVO"}, {"k": "curtiduria", "codigo": "2521012", "desc": "CURTIDURIA", "cat": "ESTABLECIMIENTOS"}, {"k": "decoracion en general", "codigo": "8942014", "desc": "DECORACIÓN EN GENERAL", "cat": "ESTABLECIMIENTOS"}, {"k": "distribucion y alquiler de peliculas", "codigo": "8822018", "desc": "DISTRIBUCIÓN Y ALQUILER DE PELICULAS", "cat": "ALQUILER O RENTA"}, {"k": "distribucion/compra venta de periodicos y revistas", "codigo": "6228010", "desc": "DISTRIBUCIÓN/COMPRA VENTA DE PERIÓDICOS Y REVISTAS", "cat": "COMPRA VENTA"}, {"k": "edicion de libros", "codigo": "2912013", "desc": "EDICIÓN DE LIBROS", "cat": "EDICIÓN"}, {"k": "edicion de periodicos y revistas", "codigo": "2911015", "desc": "EDICIÓN DE PERIÓDICOS Y REVISTAS", "cat": "EDICIÓN"}, {"k": "elaboracion de objetos alfareria y ceramica", "codigo": "3319010", "desc": "ELABORACION DE OBJETOS ALFARERIA Y CERÁMICA", "cat": "FABRICACIÓN"}, {"k": "elaboracion de pulque", "codigo": "2115013", "desc": "ELABORACION DE PULQUE", "cat": "FABRICACIÓN"}, {"k": "embotellado de aguas minerales", "codigo": "2131019", "desc": "EMBOTELLADO DE AGUAS MINERALES", "cat": "EMPACADORA O EMBOTELLADORA"}, {"k": "empacadora de carne", "codigo": "2049014", "desc": "EMPACADORA DE CARNE", "cat": "EMPACADORA O EMBOTELLADORA"}, {"k": "empacadora de otros mariscos", "codigo": "2061026", "desc": "EMPACADORA DE OTROS MARISCOS", "cat": "EMPACADORA O EMBOTELLADORA"}, {"k": "empacadora de pescado", "codigo": "2061034", "desc": "EMPACADORA DE PESCADO", "cat": "EMPACADORA O EMBOTELLADORA"}, {"k": "empacadora de te", "codigo": "2027010", "desc": "EMPACADORA DE TÉ", "cat": "EMPACADORA O EMBOTELLADORA"}, {"k": "empleado privado", "codigo": "8944098", "desc": "EMPLEADO PRIVADO", "cat": "SERVICIOS"}, {"k": "empresa de servicio de limpieza", "codigo": "8935019", "desc": "EMPRESA DE SERVICIO DE LIMPIEZA", "cat": "SERVICIOS"}, {"k": "establecimientos privados de educacion", "codigo": "9119018", "desc": "ESTABLECIMIENTOS PRIVADOS DE EDUCACIÓN", "cat": "SERVICIOS"}, {"k": "estacionamiento privado para vehiculos", "codigo": "8916019", "desc": "ESTACIONAMIENTO PRIVADO PARA VEHÍCULOS", "cat": "SERVICIOS"}, {"k": "estacionamiento publico para vehiculos", "codigo": "8916027", "desc": "ESTACIONAMIENTO PÚBLICO PARA VEHÍCULOS", "cat": "SERVICIOS"}, {"k": "estudio fotografico", "codigo": "8941016", "desc": "ESTUDIO FOTOGRÁFICO", "cat": "SERVICIOS"}, {"k": "explotacion de hule", "codigo": "322024", "desc": "EXPLOTACIÓN DE HULE", "cat": "FABRICACIÓN"}, {"k": "extraccion de otras resinas", "codigo": "322040", "desc": "EXTRACCIÓN DE OTRAS RESINAS", "cat": "FABRICACIÓN"}, {"k": "extraccion de yeso", "codigo": "1412014", "desc": "EXTRACCIÓN DE YESO", "cat": "FABRICACIÓN"}, {"k": "extraccion y beneficio de piedra", "codigo": "1411016", "desc": "EXTRACCIÓN Y BENEFICIO DE PIEDRA", "cat": "FABRICACIÓN"}, {"k": "fabric de cajas y empaques de madera", "codigo": "2621010", "desc": "FABRIC DE CAJAS Y EMPAQUES DE MADERA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de alimento para ganado y otros animales", "codigo": "2098029", "desc": "FABRICACION DE ALIMENTO PARA GANADO Y OTROS ANIMALES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de alimentos y bebidas para aves", "codigo": "2098037", "desc": "FABRICACION DE ALIMENTOS Y BEBIDAS PARA AVES", "cat": "FABRICACIÓN"}, {"k": "fabricacion con triplay y otras maderas", "codigo": "2612019", "desc": "FABRICACIÓN CON TRIPLAY Y OTRAS MADERAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de abonos y fertilizantantes quimicos", "codigo": "3021011", "desc": "FABRICACIÓN DE ABONOS Y FERTILIZANTANTES QUÍMICOS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de aguardiente de cana", "codigo": "2112019", "desc": "FABRICACIÓN DE AGUARDIENTE DE CAÑA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de aguarras", "codigo": "3093010", "desc": "FABRICACIÓN DE AGUARRAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de alfileres y agujas y broches", "codigo": "3599018", "desc": "FABRICACIÓN DE ALFILERES Y AGUJAS Y BROCHES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de anil", "codigo": "3011012", "desc": "FABRICACIÓN DE ANIL", "cat": "FABRICACIÓN"}, {"k": "fabricacion de anilinas", "codigo": "3011020", "desc": "FABRICACIÓN DE ANILINAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de articulos tejidos de cuero", "codigo": "2529058", "desc": "FABRICACIÓN DE ARTICULOS TEJIDOS DE CUERO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de articulos bordados y deshilados", "codigo": "2434017", "desc": "FABRICACIÓN DE ARTÍCULOS BORDADOS Y DESHILADOS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de articulos de cuero para viaje", "codigo": "2529024", "desc": "FABRICACIÓN DE ARTÍCULOS DE CUERO PARA VIAJE", "cat": "FABRICACIÓN"}, {"k": "fabricacion de articulos de cuero y hueso", "codigo": "2529032", "desc": "FABRICACIÓN DE ARTÍCULOS DE CUERO Y HUESO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de articulos de cuero y piel para zapatos", "codigo": "2529040", "desc": "FABRICACIÓN DE ARTÍCULOS DE CUERO Y PIEL PARA ZAPATOS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de articulos de peltre", "codigo": "3594018", "desc": "FABRICACIÓN DE ARTÍCULOS DE PELTRE", "cat": "FABRICACIÓN"}, {"k": "fabricacion de azulejos", "codigo": "3319028", "desc": "FABRICACIÓN DE AZULEJOS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de balones globos/pelotas", "codigo": "3229029", "desc": "FABRICACIÓN DE BALONES GLOBOS/PELOTAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de banda y correa de cuero", "codigo": "2529066", "desc": "FABRICACIÓN DE BANDA Y CORREA DE CUERO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de bebidas gaseosas", "codigo": "2131027", "desc": "FABRICACIÓN DE BEBIDAS GASEOSAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de bolsas y carteras de cuero", "codigo": "2529074", "desc": "FABRICACIÓN DE BOLSAS Y CARTERAS DE CUERO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de cachuchas y gorras", "codigo": "2417013", "desc": "FABRICACIÓN DE CACHUCHAS Y GORRAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de calzado de cuero o piel", "codigo": "2519017", "desc": "FABRICACIÓN DE CALZADO DE CUERO O PIEL", "cat": "FABRICACIÓN"}, {"k": "fabricacion de camisas", "codigo": "2414019", "desc": "FABRICACIÓN DE CAMISAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de candiles y arbotantes", "codigo": "3799022", "desc": "FABRICACIÓN DE CANDILES Y ARBOTANTES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de carnes frias y embutidos", "codigo": "2049022", "desc": "FABRICACIÓN DE CARNES FRÍAS Y EMBUTIDOS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de casimires y panos", "codigo": "2315027", "desc": "FABRICACIÓN DE CASIMIRES Y PAÑOS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de cera, pulimentos y abrillantadores", "codigo": "3092012", "desc": "FABRICACIÓN DE CERA, PULIMENTOS Y ABRILLANTADORES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de cerveza", "codigo": "2122018", "desc": "FABRICACIÓN DE CERVEZA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de chocolates", "codigo": "2081016", "desc": "FABRICACIÓN DE CHOCOLATES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de colchas", "codigo": "2316025", "desc": "FABRICACIÓN DE COLCHAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de concentrados de fruta", "codigo": "2012037", "desc": "FABRICACIÓN DE CONCENTRADOS DE FRUTA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de corbatas", "codigo": "2416015", "desc": "FABRICACIÓN DE CORBATAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de corseteria y ropa interior dama", "codigo": "2421014", "desc": "FABRICACIÓN DE CORSETERÍA Y ROPA INTERIOR DAMA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de cortinas de tela y manteleria", "codigo": "2431021", "desc": "FABRICACIÓN DE CORTINAS DE TELA Y MANTELERÍA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de costales", "codigo": "2439025", "desc": "FABRICACIÓN DE COSTALES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de cubreasientos para vehiculos", "codigo": "2432011", "desc": "FABRICACIÓN DE CUBREASIENTOS PARA VEHICULOS", "cat": "FABRICACIÓN Y COMPRA-VENTA"}, {"k": "fabricacion de desinfectantes y desodorizantes", "codigo": "3092020", "desc": "FABRICACIÓN DE DESINFECTANTES Y DESODORIZANTES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de duelas y otros materiales de madera", "codigo": "2633015", "desc": "FABRICACIÓN DE DUELAS Y OTROS MATERIALES DE MADERA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de dulces bombones y confiteria", "codigo": "2082014", "desc": "FABRICACIÓN DE DULCES BOMBONES Y CONFITERÍA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de encurtidos", "codigo": "2012045", "desc": "FABRICACIÓN DE ENCURTIDOS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de escobas", "codigo": "3996016", "desc": "FABRICACIÓN DE ESCOBAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de esferas de vidrio", "codigo": "3329019", "desc": "FABRICACIÓN DE ESFERAS DE VIDRIO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de espejos y lunas", "codigo": "3324027", "desc": "FABRICACIÓN DE ESPEJOS Y LUNAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de estructuras de metal", "codigo": "3531010", "desc": "FABRICACIÓN DE ESTRUCTURAS DE METAL", "cat": "FABRICACIÓN"}, {"k": "fabricacion de fibra de vidrio", "codigo": "3322021", "desc": "FABRICACIÓN DE FIBRA DE VIDRIO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de fornituras militares de cuero", "codigo": "2529090", "desc": "FABRICACIÓN DE FORNITURAS MILITARES DE CUERO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de frituras", "codigo": "2094019", "desc": "FABRICACIÓN DE FRITURAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de galletas", "codigo": "2072023", "desc": "FABRICACIÓN DE GALLETAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de grasas y cremas lustradoras", "codigo": "3092038", "desc": "FABRICACIÓN DE GRASAS Y CREMAS LUSTRADORAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de guantes", "codigo": "2416023", "desc": "FABRICACIÓN DE GUANTES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de guaraches y sandalias", "codigo": "2512029", "desc": "FABRICACIÓN DE GUARACHES Y SANDALIAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de helados nieves y paletas", "codigo": "2097013", "desc": "FABRICACIÓN DE HELADOS NIEVES Y PALETAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de hielo", "codigo": "2096015", "desc": "FABRICACIÓN DE HIELO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de hielo seco", "codigo": "3099034", "desc": "FABRICACIÓN DE HIELO SECO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de hilos para coser", "codigo": "2313013", "desc": "FABRICACIÓN DE HILOS PARA COSER", "cat": "FABRICACIÓN"}, {"k": "fabricacion de impermeables", "codigo": "2419027", "desc": "FABRICACIÓN DE IMPERMEABLES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de insecticidas y plaguicidas", "codigo": "3022019", "desc": "FABRICACIÓN DE INSECTICIDAS Y PLAGUICIDAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de jabon y detergente", "codigo": "3061025", "desc": "FABRICACIÓN DE JABÓN Y DETERGENTE", "cat": "FABRICACIÓN"}, {"k": "fabricacion de juguetes (no hule o plastico)", "codigo": "3991016", "desc": "FABRICACIÓN DE JUGUETES (NO HULE O PLÁSTICO)", "cat": "FABRICACIÓN"}, {"k": "fabricacion de juguetes excepto los de hule", "codigo": "3223021", "desc": "FABRICACIÓN DE JUGUETES EXCEPTO LOS DE HULE", "cat": "FABRICACIÓN"}, {"k": "fabricacion de ladrillos", "codigo": "3331022", "desc": "FABRICACIÓN DE LADRILLOS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de leche condensada, evaporada", "codigo": "2053015", "desc": "FABRICACIÓN DE LECHE CONDENSADA, EVAPORADA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de loza y porcelana", "codigo": "3319036", "desc": "FABRICACIÓN DE LOZA Y PORCELANA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de lamparas electricas", "codigo": "3799030", "desc": "FABRICACIÓN DE LÁMPARAS ELÉCTRICAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de malta", "codigo": "2121010", "desc": "FABRICACIÓN DE MALTA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de mangos de madera", "codigo": "2639021", "desc": "FABRICACIÓN DE MANGOS DE MADERA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de mantones y chalinas", "codigo": "2419043", "desc": "FABRICACIÓN DE MANTONES Y CHALINAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de marcos y molduras de madera", "codigo": "2719013", "desc": "FABRICACIÓN DE MARCOS Y MOLDURAS DE MADERA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de marquetas y estuchado de azucar", "codigo": "2031011", "desc": "FABRICACIÓN DE MARQUETAS Y ESTUCHADO DE AZÚCAR", "cat": "FABRICACIÓN"}, {"k": "fabricacion de medallas, insignias y placas", "codigo": "3931012", "desc": "FABRICACIÓN DE MEDALLAS, INSIGNIAS Y PLACAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de mosaicos terrazos y granito", "codigo": "3354016", "desc": "FABRICACIÓN DE MOSAICOS TERRAZOS Y GRANITO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de muebles de madera", "codigo": "2711019", "desc": "FABRICACIÓN DE MUEBLES DE MADERA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de muebles de material sintetico", "codigo": "2711027", "desc": "FABRICACIÓN DE MUEBLES DE MATERIAL SINTÉTICO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de muebles y articulos sanitarios", "codigo": "3319044", "desc": "FABRICACIÓN DE MUEBLES Y ARTÍCULOS SANITARIOS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de otras prendas exteriores de vestir", "codigo": "2412013", "desc": "FABRICACIÓN DE OTRAS PRENDAS EXTERIORES DE VESTIR", "cat": "FABRICACIÓN"}, {"k": "fabricacion de otras prendas exteriores de vestir", "codigo": "2415017", "desc": "FABRICACIÓN DE OTRAS PRENDAS EXTERIORES DE VESTIR", "cat": "FABRICACIÓN"}, {"k": "fabricacion de otras substancias quimicas", "codigo": "3013026", "desc": "FABRICACIÓN DE OTRAS SUBSTANCIAS QUIMICAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de otros aguardientes no cana", "codigo": "2114015", "desc": "FABRICACIÓN DE OTROS AGUARDIENTES NO CAÑA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de otros articulos de aluminio", "codigo": "3516038", "desc": "FABRICACIÓN DE OTROS ARTÍCULOS DE ALUMINIO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de otros articulos de cera", "codigo": "3095016", "desc": "FABRICACIÓN DE OTROS ARTÍCULOS DE CERA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de otros articulos de corcho", "codigo": "2632025", "desc": "FABRICACIÓN DE OTROS ARTÍCULOS DE CORCHO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de otros articulos de cuero", "codigo": "2529107", "desc": "FABRICACIÓN DE OTROS ARTÍCULOS DE CUERO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de otros articulos de madera", "codigo": "2639039", "desc": "FABRICACIÓN DE OTROS ARTÍCULOS DE MADERA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de otros articulos para deporte", "codigo": "3951036", "desc": "FABRICACIÓN DE OTROS ARTÍCULOS PARA DEPORTE", "cat": "FABRICACIÓN"}, {"k": "fabricacion de otros materiales colorantes", "codigo": "3011038", "desc": "FABRICACIÓN DE OTROS MATERIALES COLORANTES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de otros muebles de metal", "codigo": "3521037", "desc": "FABRICACIÓN DE OTROS MUEBLES DE METAL", "cat": "FABRICACIÓN"}, {"k": "fabricacion de otros productos alimenticios", "codigo": "2099043", "desc": "FABRICACIÓN DE OTROS PRODUCTOS ALIMENTICIOS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de pan y pasteles", "codigo": "2071017", "desc": "FABRICACIÓN DE PAN Y PASTELES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de pastas alimenticias", "codigo": "2072031", "desc": "FABRICACIÓN DE PASTAS ALIMENTICIAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de panuelos, panoletas y mascadas", "codigo": "2416031", "desc": "FABRICACIÓN DE PAÑUELOS, PAÑOLETAS Y MASCADAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de persianas de madera", "codigo": "2712017", "desc": "FABRICACIÓN DE PERSIANAS DE MADERA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de piloncillo", "codigo": "2032019", "desc": "FABRICACIÓN DE PILONCILLO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de pinturas, barnices, lacas", "codigo": "3041019", "desc": "FABRICACIÓN DE PINTURAS, BARNICES, LACAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de productos manufacturados no clasificados", "codigo": "3999101", "desc": "FABRICACIÓN DE PRODUCTOS MANUFACTURADOS NO CLASIFICADOS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de puertas y ventanas de madera", "codigo": "2633023", "desc": "FABRICACIÓN DE PUERTAS Y VENTANAS DE MADERA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de rebozos y cinturones tejidos", "codigo": "2419051", "desc": "FABRICACIÓN DE REBOZOS Y CINTURONES TEJIDOS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de refrescos de frutas naturales", "codigo": "2131035", "desc": "FABRICACIÓN DE REFRESCOS DE FRUTAS NATURALES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de ropa con piel", "codigo": "2419069", "desc": "FABRICACIÓN DE ROPA CON PIEL", "cat": "FABRICACIÓN"}, {"k": "fabricacion de ropa interior para caballero", "codigo": "2429018", "desc": "FABRICACIÓN DE ROPA INTERIOR PARA CABALLERO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de sombreros (excepto de palma)", "codigo": "2417021", "desc": "FABRICACIÓN DE SOMBREROS (EXCEPTO DE PALMA)", "cat": "FABRICACIÓN"}, {"k": "fabricacion de sombreros de palma", "codigo": "2418011", "desc": "FABRICACIÓN DE SOMBREROS DE PALMA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de tapetes y alfombras", "codigo": "2392017", "desc": "FABRICACIÓN DE TAPETES Y ALFOMBRAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de telas para tapiceria", "codigo": "2392025", "desc": "FABRICACIÓN DE TELAS PARA TAPICERIA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de tequila y mezcal", "codigo": "2111011", "desc": "FABRICACIÓN DE TEQUILA Y MEZCAL", "cat": "FABRICACIÓN"}, {"k": "fabricacion de tirantes", "codigo": "2419035", "desc": "FABRICACIÓN DE TIRANTES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de toallas", "codigo": "2316017", "desc": "FABRICACIÓN DE TOALLAS", "cat": "FABRICACIÓN"}, {"k": "fabricacion de toneles y barricas de madera", "codigo": "2621028", "desc": "FABRICACIÓN DE TONELES Y BARRICAS DE MADERA", "cat": "FABRICACIÓN"}, {"k": "fabricacion de trajes para caballero", "codigo": "2412021", "desc": "FABRICACIÓN DE TRAJES PARA CABALLERO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de uniformes", "codigo": "2413011", "desc": "FABRICACIÓN DE UNIFORMES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de velas/veladoras/cirio", "codigo": "3095024", "desc": "FABRICACIÓN DE VELAS/VELADORAS/CIRIO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de vestidos y otras prendas exteriores", "codigo": "2411015", "desc": "FABRICACIÓN DE VESTIDOS Y OTRAS PRENDAS EXTERIORES", "cat": "FABRICACIÓN"}, {"k": "fabricacion de vidrio", "codigo": "3321015", "desc": "FABRICACIÓN DE VIDRIO", "cat": "FABRICACIÓN"}, {"k": "fabricacion de yeso", "codigo": "3342029", "desc": "FABRICACIÓN DE YESO", "cat": "FABRICACIÓN"}, {"k": "fabricacion y rehidratacion de leche", "codigo": "2051019", "desc": "FABRICACIÓN Y REHIDRATACIÓN DE LECHE", "cat": "FABRICACIÓN"}, {"k": "formacion de praderas y potreros artificiales", "codigo": "291013", "desc": "FORMACIÓN DE PRADERAS Y POTREROS ARTIFICIALES", "cat": "FABRICACIÓN"}, {"k": "fotocopiado", "codigo": "2921048", "desc": "FOTOCOPIADO", "cat": "COMPRA VENTA"}, {"k": "grabacion de sonido en peliculas", "codigo": "8821028", "desc": "GRABACIÓN DE SONIDO EN PELICULAS", "cat": "SERVICIOS"}, {"k": "grabado en metal", "codigo": "2929050", "desc": "GRABADO EN METAL", "cat": "FABRICACIÓN"}, {"k": "imprenta (tipografia)", "codigo": "2921056", "desc": "IMPRENTA (TIPOGRAFIA)", "cat": "FABRICACIÓN"}, {"k": "impresion con cilindros-rotograbado", "codigo": "2921072", "desc": "IMPRESIÓN CON CILINDROS-ROTOGRABADO", "cat": "FABRICACIÓN"}, {"k": "impresion mediante cilindros de caucho", "codigo": "2921064", "desc": "IMPRESIÓN MEDIANTE CILINDROS DE CAUCHO", "cat": "FABRICACIÓN"}, {"k": "inseminacion artificial y otros servicios de ganado", "codigo": "291021", "desc": "INSEMINACION ARTIFICIAL Y OTROS SERVICIOS DE GANADO", "cat": "OTROS (ANIMALES)"}, {"k": "instalaciones del sistema electrico", "codigo": "4222014", "desc": "INSTALACIONES DEL SISTEMA ELÉCTRICO", "cat": "ESTABLECIMIENTOS"}, {"k": "instalacion de sistemas de aire acondicionado", "codigo": "4229010", "desc": "INSTALACIÓN DE SISTEMAS DE AIRE ACONDICIONADO", "cat": "ESTABLECIMIENTOS"}, {"k": "laboratorios de analisis clinicos", "codigo": "9214016", "desc": "LABORATORIOS DE ANÁLISIS CLÍNICOS", "cat": "SERVICIOS"}, {"k": "lavanderia", "codigo": "8934011", "desc": "LAVANDERIA", "cat": "SERVICIOS"}, {"k": "medicinas", "codigo": "6231013", "desc": "MEDICINAS", "cat": "COMPRA VENTA"}, {"k": "molino de arroz", "codigo": "2024016", "desc": "MOLINO DE ARROZ", "cat": "MOLINO"}, {"k": "molino de avena", "codigo": "2029016", "desc": "MOLINO DE AVENA", "cat": "MOLINO"}, {"k": "molino de cebada", "codigo": "2029024", "desc": "MOLINO DE CEBADA", "cat": "MOLINO"}, {"k": "molino de maiz", "codigo": "2022010", "desc": "MOLINO DE MAÍZ", "cat": "MOLINO"}, {"k": "molino de nixtamal", "codigo": "2023018", "desc": "MOLINO DE NIXTAMAL", "cat": "MOLINO"}, {"k": "molino de trigo", "codigo": "2021012", "desc": "MOLINO DE TRIGO", "cat": "MOLINO"}, {"k": "molino para otros granos excepto cereales", "codigo": "2028042", "desc": "MOLINO PARA OTROS GRANOS EXCEPTO CEREALES", "cat": "MOLINO"}, {"k": "molino y tostador de cafe", "codigo": "2026012", "desc": "MOLINO Y TOSTADOR DE CAFÉ", "cat": "MOLINO"}, {"k": "neveria y refresqueria", "codigo": "8714017", "desc": "NEVERÍA Y REFRESQUERÍA", "cat": "ESTABLECIMIENTOS"}, {"k": "orfebreria", "codigo": "3932028", "desc": "ORFEBRERÍA", "cat": "ESTABLECIMIENTOS"}, {"k": "organizaciones de abogados, medicos, ingenieros", "codigo": "9312018", "desc": "ORGANIZACIONES DE ABOGADOS, MÉDICOS, INGENIEROS", "cat": "SERVICIOS"}, {"k": "otros aparatos electricos", "codigo": "6419015", "desc": "OTROS APARATOS ELÉCTRICOS", "cat": "COMPRA VENTA"}, {"k": "otros articulos electricos", "codigo": "6311039", "desc": "OTROS ARTÍCULOS ELÉCTRICOS", "cat": "COMPRA VENTA"}, {"k": "otros cultivos permanentes", "codigo": "149014", "desc": "OTROS CULTIVOS PERMANENTES", "cat": "CULTIVO"}, {"k": "panteon", "codigo": "8944010", "desc": "PANTEÓN", "cat": "SERVICIOS"}, {"k": "perfumes", "codigo": "6231021", "desc": "PERFUMES", "cat": "COMPRA VENTA"}, {"k": "promocion de espectaculos deportivos", "codigo": "8829048", "desc": "PROMOCIÓN DE ESPECTÁCULOS DEPORTIVOS", "cat": "SERVICIOS"}, {"k": "promocion de espectaculos taurinos", "codigo": "8829056", "desc": "PROMOCIÓN DE ESPECTÁCULOS TAURINOS", "cat": "SERVICIOS"}, {"k": "purificacion de agua, no captacion", "codigo": "2131043", "desc": "PURIFICACION DE AGUA, NO CAPTACION", "cat": "EMPACADORA O EMBOTELLADORA"}, {"k": "rastro", "codigo": "2041010", "desc": "RASTRO", "cat": "OTROS (ANIMALES)"}, {"k": "refrigeradores lavadoras y estufas", "codigo": "6311013", "desc": "REFRIGERADORES LAVADORAS Y ESTUFAS", "cat": "COMPRA VENTA"}, {"k": "restaurante", "codigo": "8711021", "desc": "RESTAURANTE", "cat": "ESTABLECIMIENTOS"}, {"k": "salchichoneria", "codigo": "6131015", "desc": "SALCHICHONERIA", "cat": "ESTABLECIMIENTOS"}, {"k": "salon de belleza", "codigo": "8933013", "desc": "SALON DE BELLEZA", "cat": "SERVICIOS"}, {"k": "salon de fiestas", "codigo": "8521016", "desc": "SALON DE FIESTAS", "cat": "SERVICIOS"}, {"k": "servicio de bolerias, masajistas, sanitarios publicos", "codigo": "8939011", "desc": "SERVICIO DE BOLERÍAS, MASAJISTAS, SANITARIOS PÚBLICOS", "cat": "SERVICIOS"}, {"k": "servicio de preparacion alimentos, merenderos, cenadurias", "codigo": "8719017", "desc": "SERVICIO DE PREPARACION ALIMENTOS, MERENDEROS, CENADURÍAS", "cat": "ESTABLECIMIENTOS"}, {"k": "servicios de alimentos y bebidas en loncherias taquerias", "codigo": "8712011", "desc": "SERVICIOS DE ALIMENTOS Y BEBIDAS EN LONCHERIAS TAQUERIAS", "cat": "ESTABLECIMIENTOS"}, {"k": "servicios de almacenamiento y refrigeracion", "codigo": "7511018", "desc": "SERVICIOS DE ALMACENAMIENTO Y REFRIGERACIÓN", "cat": "TRANSPORTE, CORREOS, ALMACENAMIENTO"}, {"k": "servicios de bufetes juridicos", "codigo": "8412017", "desc": "SERVICIOS DE BUFETES JURÍDICOS", "cat": "SERVICIOS"}, {"k": "servicios de capacitacion tecnica de oficios", "codigo": "9122011", "desc": "SERVICIOS DE CAPACITACIÓN TÉCNICA DE OFICIOS", "cat": "SERVICIOS"}, {"k": "servicios de consultorios-clinicas dentales", "codigo": "9213018", "desc": "SERVICIOS DE CONSULTORIOS-CLÍNICAS DENTALES", "cat": "SERVICIOS"}, {"k": "servicios de ensenanza comercial e idiomas", "codigo": "9121013", "desc": "SERVICIOS DE ENSEÑANZA COMERCIAL E IDIOMAS", "cat": "SERVICIOS"}, {"k": "servicios de ensenanza de musica y danza", "codigo": "9129017", "desc": "SERVICIOS DE ENSEÑANZA DE MÚSICA Y DANZA", "cat": "SERVICIOS"}, {"k": "servicios de ensenanza secundaria", "codigo": "9113010", "desc": "SERVICIOS DE ENSEÑANZA SECUNDARIA", "cat": "SERVICIOS"}, {"k": "servicios de laboratorios de radiologia", "codigo": "9215014", "desc": "SERVICIOS DE LABORATORIOS DE RADIOLOGIA", "cat": "SERVICIOS"}, {"k": "servicios de pintado y tapizado de inmuebles", "codigo": "4291019", "desc": "SERVICIOS DE PINTADO Y TAPIZADO DE INMUEBLES", "cat": "SERVICIOS PARA AUTOMÓVILES"}, {"k": "servicios de reparacion de autos de traccion", "codigo": "8919013", "desc": "SERVICIOS DE REPARACIÓN DE AUTOS DE TRACCIÓN", "cat": "SERVICIOS PARA AUTOMÓVILES"}, {"k": "servicios de reparacion de motos y bicicletas", "codigo": "8912017", "desc": "SERVICIOS DE REPARACIÓN DE MOTOS Y BICICLETAS", "cat": "SERVICIOS PARA AUTOMÓVILES"}, {"k": "servicios en merenderos cenadurias y preparacion", "codigo": "2029032", "desc": "SERVICIOS EN MERENDEROS CENADURIAS Y PREPARACION", "cat": "MOLINO"}, {"k": "servicios ensenanza preprimaria y primaria", "codigo": "9112012", "desc": "SERVICIOS ENSEÑANZA PREPRIMARIA Y PRIMARIA", "cat": "SERVICIOS"}, {"k": "servicios postales", "codigo": "7614010", "desc": "SERVICIOS POSTALES", "cat": "TRANSPORTE, CORREOS, ALMACENAMIENTO"}, {"k": "servicios veterinarios en clinicas y consultorios", "codigo": "9231010", "desc": "SERVICIOS VETERINARIOS EN CLINICAS Y CONSULTORIOS", "cat": "OTROS (ANIMALES)"}, {"k": "talabarteria", "codigo": "2529115", "desc": "TALABARTERÍA", "cat": "ESTABLECIMIENTOS"}, {"k": "taller de confeccion de vestidos", "codigo": "2411023", "desc": "TALLER DE CONFECCIÓN DE VESTIDOS", "cat": "ESTABLECIMIENTOS"}, {"k": "taller de herreria", "codigo": "3516054", "desc": "TALLER DE HERRERIA", "cat": "ESTABLECIMIENTOS"}, {"k": "taller de hojalateria", "codigo": "3591022", "desc": "TALLER DE HOJALATERÍA", "cat": "TALLER"}, {"k": "taller de marmoleria", "codigo": "3353018", "desc": "TALLER DE MARMOLERÍA", "cat": "ESTABLECIMIENTOS"}, {"k": "taller de plomeria", "codigo": "4221016", "desc": "TALLER DE PLOMERÍA", "cat": "ESTABLECIMIENTOS"}, {"k": "taller de reparacion de aparatos electricos", "codigo": "8922016", "desc": "TALLER DE REPARACION DE APARATOS ELÉCTRICOS", "cat": "TALLER"}, {"k": "taller de reparacion de autos y camiones", "codigo": "8911019", "desc": "TALLER DE REPARACIÓN DE AUTOS Y CAMIONES", "cat": "TALLER"}, {"k": "taller de reparacion de calzado", "codigo": "8921018", "desc": "TALLER DE REPARACIÓN DE CALZADO", "cat": "ESTABLECIMIENTOS"}, {"k": "taller de sastreria", "codigo": "2412039", "desc": "TALLER DE SASTRERÍA", "cat": "ESTABLECIMIENTOS"}, {"k": "taller de tapiceria", "codigo": "8924012", "desc": "TALLER DE TAPICERÍA", "cat": "ESTABLECIMIENTOS"}, {"k": "taller mecanico de fabricacion y reparacion", "codigo": "3699024", "desc": "TALLER MECÁNICO DE FABRICACIÓN Y REPARACIÓN", "cat": "TALLER"}, {"k": "taller reparacion de articulos electricos", "codigo": "8922024", "desc": "TALLER REPARACION DE ARTÍCULOS ELÉCTRICOS", "cat": "TALLER"}, {"k": "taxidermista", "codigo": "8949010", "desc": "TAXIDERMISTA", "cat": "SERVICIOS"}, {"k": "tienda de abarrotes y miscelanea", "codigo": "6131023", "desc": "TIENDA DE ABARROTES Y MISCELÁNEA", "cat": "ESTABLECIMIENTOS"}, {"k": "tienda de autoservicio", "codigo": "6411011", "desc": "TIENDA DE AUTOSERVICIO", "cat": "ESTABLECIMIENTOS"}, {"k": "tiendas de departamentos especializados", "codigo": "6412019", "desc": "TIENDAS DE DEPARTAMENTOS ESPECIALIZADOS", "cat": "ESTABLECIMIENTOS"}, {"k": "tortilleria", "codigo": "2093011", "desc": "TORTILLERÍA", "cat": "ESTABLECIMIENTOS"}, {"k": "transporte autos de sitio-turismo", "codigo": "7114010", "desc": "TRANSPORTE AUTOS DE SITIO-TURISMO", "cat": "TRANSPORTE, CORREOS, ALMACENAMIENTO"}, {"k": "transporte en autobus urbano y suburbano de pasaje", "codigo": "7111016", "desc": "TRANSPORTE EN AUTOBÚS URBANO Y SUBURBANO DE PASAJE", "cat": "TRANSPORTE, CORREOS, ALMACENAMIENTO"}, {"k": "transporte en automovil de ruta fija", "codigo": "7115018", "desc": "TRANSPORTE EN AUTOMÓVIL DE RUTA FIJA", "cat": "TRANSPORTE, CORREOS, ALMACENAMIENTO"}, {"k": "transporte en foraneo de pasajeros", "codigo": "7112014", "desc": "TRANSPORTE EN FORÁNEO DE PASAJEROS", "cat": "TRANSPORTE, CORREOS, ALMACENAMIENTO"}, {"k": "tratamiento y envase de miel de abeja", "codigo": "2084010", "desc": "TRATAMIENTO Y ENVASE DE MIEL DE ABEJA", "cat": "EMPACADORA O EMBOTELLADORA"}, {"k": "vulcanizacion de llantas y camaras", "codigo": "3212024", "desc": "VULCANIZACIÓN DE LLANTAS Y CAMARAS", "cat": "SERVICIOS PARA AUTOMÓVILES"}];
+
+// =================== STORAGE ===================
+const KEY_DATA="os_isla_agenda_v1";
+const KEY_PIN ="os_isla_pin_v1";
+
+// =================== HELPERS ===================
+const $=(id)=>document.getElementById(id);
+const norm=(s)=> (s||"").toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu,"").replace(/\s+/g," ").trim();
+
+function loadData(){ try{ return JSON.parse(localStorage.getItem(KEY_DATA)||"[]"); }catch{ return []; } }
+function saveData(a){ localStorage.setItem(KEY_DATA, JSON.stringify(a)); }
+function getPin(){ return localStorage.getItem(KEY_PIN)||"123456"; }
+function setPin(p){ localStorage.setItem(KEY_PIN,p); }
+
+function ymd(d){ const yyyy=d.getFullYear(); const mm=String(d.getMonth()+1).padStart(2,"0"); const dd=String(d.getDate()).padStart(2,"0"); return `${yyyy}-${mm}-${dd}`; }
+function pretty(iso){ const [y,m,d]=iso.split("-"); return `${d}/${m}/${y}`; }
+function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+function startOfWeek(d){ const x=new Date(d); const day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); x.setHours(0,0,0,0); return x; }
+
+function show(view){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  $("view-"+view).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+  if(view==="home") $("navHome").classList.add("active");
+  if(view==="cal") $("navCal").classList.add("active");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// =================== LOCK ===================
+const lockScreen=$("lockScreen");
+const app=$("app");
+$("enterBtn").onclick=()=>{
+  if($("pinInput").value.trim()===getPin()){
+    lockScreen.style.display="none";
+    app.style.display="block";
+    init();
+  } else alert("PIN incorrecto");
+};
+$("changePinBtn").onclick=()=>{
+  const cur=prompt("PIN actual (6 dígitos):","");
+  if(cur===null) return;
+  if(cur.trim()!==getPin()) return alert("PIN actual incorrecto");
+  const np=prompt("Nuevo PIN (6 dígitos):","");
+  if(!np) return;
+  if(!/^\d{6}$/.test(np.trim())) return alert("Debe ser de 6 dígitos");
+  setPin(np.trim());
+  alert("PIN actualizado ✅");
+};
+$("navLock").onclick=()=>{ app.style.display="none"; lockScreen.style.display="flex"; $("pinInput").value=""; };
+
+// =================== HOME MENU ===================
+document.querySelectorAll("[data-go]").forEach(btn=>{
+  btn.addEventListener("click", ()=> show(btn.getAttribute("data-go")));
+});
+$("navHome").onclick=()=> show("home");
+$("navCal").onclick=()=> show("cal");
+
+// =================== CALL ===================
+function callNumber(n){ window.location.href = "tel:"+n; }
+
+// =================== SUGGEST UI ===================
+function showSuggest(box, items, onPick){
+  box.innerHTML="";
+  items.forEach(it=>{
+    const d=document.createElement("div");
+    d.textContent=it.label;
+    d.onclick=()=>onPick(it);
+    box.appendChild(d);
+  });
+  box.style.display = items.length ? "block" : "none";
+}
+function hideSuggest(box){ box.style.display="none"; box.innerHTML=""; }
+
+// =================== CP SEARCH ===================
+const cpSuggest=$("cpSuggest");
+$("cpQuery").addEventListener("input", ()=>{
+  const raw=$("cpQuery").value.trim();
+  if(raw.length<2){ hideSuggest(cpSuggest); $("cpResult").textContent=""; return; }
+  const q=norm(raw);
+  const isCp=/^\d{4,5}$/.test(raw);
+  const res=[];
+
+  if(isCp){
+    const cp=raw.padStart(5,"0");
+    const info=SEPOMEX_CP_INDEX[cp];
+    if(info){
+      const labels=(info.asentamientos||[]).slice(0,20).map(a=>`${a.colonia} (${a.tipo})`);
+      $("cpResult").innerHTML = `<b>CP ${cp}</b><br>${info.municipio}, ${info.estado}<br><span class="small">${labels.join(" • ")}</span>`;
+    } else {
+      $("cpResult").textContent="No encontrado en el catálogo precargado.";
+    }
+    hideSuggest(cpSuggest);
+    return;
+  }
+
+  for(const it of SEPOMEX_COLONIAS){
+    if(it.k.includes(q)){
+      res.push({...it, label:`${it.colonia} (${it.tipo}) — ${it.mun}, ${it.edo} — CP ${it.cp}`});
+      if(res.length>=20) break;
+    }
+  }
+  showSuggest(cpSuggest,res,(pick)=>{
+    $("cpQuery").value = pick.colonia;
+    $("cpResult").innerHTML = `<b>CP ${pick.cp}</b><br>${pick.mun}, ${pick.edo}<br><span class="small">${pick.colonia} (${pick.tipo})</span>`;
+    hideSuggest(cpSuggest);
+  });
+});
+$("cpQuery").addEventListener("blur", ()=>setTimeout(()=>hideSuggest(cpSuggest),150));
+$("cpBack").onclick=()=> show("home");
+
+// =================== OFICIOS SEARCH ===================
+const ofSuggest=$("ofSuggest");
+$("ofQuery").addEventListener("input", ()=>{
+  const q=norm($("ofQuery").value);
+  if(q.length<3){ hideSuggest(ofSuggest); return; }
+  const res=[];
+  for(const it of OFICIOS){
+    if(it.k.includes(q)){
+      res.push({...it, label:`${it.desc} — Código ${it.codigo} — ${it.cat}`});
+      if(res.length>=20) break;
+    }
+  }
+  showSuggest(ofSuggest,res,(pick)=>{
+    $("ofQuery").value=pick.desc;
+    $("ofCode").value=pick.codigo;
+    $("ofCat").value=pick.cat;
+    hideSuggest(ofSuggest);
+  });
+});
+$("ofQuery").addEventListener("blur", ()=>setTimeout(()=>hideSuggest(ofSuggest),150));
+$("ofBack").onclick=()=> show("home");
+
+// =================== NUM BACK ===================
+$("numBack").onclick=()=> show("home");
+
+// =================== CALENDAR ===================
+let weekBase=startOfWeek(new Date());
+$("wkPrev").onclick=()=>{ weekBase=addDays(weekBase,-7); renderWeek(); };
+$("wkNext").onclick=()=>{ weekBase=addDays(weekBase, 7); renderWeek(); };
+$("wkToday").onclick=()=>{ weekBase=startOfWeek(new Date()); renderWeek(); };
+$("calBack").onclick=()=> show("home");
+$("lockBtn").onclick=()=> $("navLock").click();
+
+$("newAct").onclick=()=> openForm();
+
+function renderWeek(){
+  const data=loadData();
+  const start=new Date(weekBase);
+  const todayISO=ymd(new Date());
+  const byDate=new Map();
+  for(const it of data){
+    if(!it.fecha) continue;
+    if(!byDate.has(it.fecha)) byDate.set(it.fecha,[]);
+    byDate.get(it.fecha).push(it);
+  }
+  for(const [k,arr] of byDate){
+    arr.sort((a,b)=> ((a.hora||"")+(a.cliente||"")).localeCompare((b.hora||"")+(b.cliente||"")));
+  }
+
+  const weekCard=$("weekCard");
+  weekCard.innerHTML="";
+  const names=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+
+  for(let i=0;i<7;i++){
+    const d=addDays(start,i);
+    const iso=ymd(d);
+    const arr=byDate.get(iso)||[];
+    const wrap=document.createElement("div");
+    wrap.className="day";
+    wrap.innerHTML = `<h3>${names[i]} <span class="badge">${pretty(iso)}${iso===todayISO?" • Hoy":""}</span></h3>`;
+
+    if(arr.length===0){
+      const p=document.createElement("div");
+      p.className="small";
+      p.textContent="Sin actividades";
+      wrap.appendChild(p);
+    } else {
+      for(const it of arr){
+        const box=document.createElement("div");
+        box.className="item";
+        box.innerHTML = `
+          <span class="tag ${it.estatus}">${it.estatus}</span>
+          <b>${it.hora ? (it.hora+" — ") : ""}${it.cliente}</b>
+          <div class="meta">
+            ${it.tel ? ("📞 "+it.tel) : ""}
+            ${it.colonia ? ("• 🧭 "+it.colonia) : ""}
+            ${it.cp ? ("• CP "+it.cp) : ""}
+          </div>
+          ${it.direccion ? (`<div class="meta" style="margin-top:6px">📍 ${it.direccion}</div>`) : ""}
+          <div class="actions">
+            <button class="ok" data-act="done" data-id="${it.id}">Realizada</button>
+            <button class="secondary" data-act="edit" data-id="${it.id}">Editar</button>
+            <button class="bad" data-act="del" data-id="${it.id}">Eliminar</button>
+          </div>
+        `;
+        wrap.appendChild(box);
+      }
+    }
+
+    const quick=document.createElement("button");
+    quick.className="secondary";
+    quick.style.width="100%";
+    quick.style.padding="12px";
+    quick.style.borderRadius="14px";
+    quick.style.marginTop="8px";
+    quick.textContent="➕ Agregar aquí";
+    quick.onclick=()=> openForm(iso);
+    wrap.appendChild(quick);
+
+    weekCard.appendChild(wrap);
+  }
+
+  renderTodayBox();
+}
+
+function renderTodayBox(){
+  const data=loadData();
+  const today=ymd(new Date());
+  const todays=data.filter(x=>x.fecha===today).sort((a,b)=> (a.hora||"").localeCompare(b.hora||""));
+  const box=$("todayBox");
+  if(todays.length===0){
+    box.textContent="Aún no hay actividades para hoy.";
+    return;
+  }
+  box.innerHTML = todays.slice(0,6).map(it=>`• <b>${it.hora?it.hora:"--:--"}</b> ${it.cliente}${it.colonia?(" — "+it.colonia):""}`).join("<br>");
+  if(todays.length>6) box.innerHTML += `<br><span class="small">+${todays.length-6} más…</span>`;
+}
+
+// Calendar item actions
+$("weekCard").addEventListener("click",(e)=>{
+  const btn=e.target.closest("button[data-act]");
+  if(!btn) return;
+  const id=btn.getAttribute("data-id");
+  const act=btn.getAttribute("data-act");
+  const data=loadData();
+  const idx=data.findIndex(x=>x.id===id);
+  if(idx<0) return;
+
+  if(act==="done"){
+    data[idx].estatus="Realizada";
+    saveData(data);
+    renderWeek();
+  }
+  if(act==="del"){
+    if(confirm("¿Eliminar esta actividad?")){
+      data.splice(idx,1);
+      saveData(data);
+      renderWeek();
+    }
+  }
+  if(act==="edit"){
+    const it=data[idx];
+    openForm(it.fecha, it);
+  }
+});
+
+// Export/Import
+$("exportBtn").onclick=()=>{
+  const data=loadData();
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`os_isla_respaldo_${ymd(new Date())}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+};
+$("importBtn").onclick=()=> $("importFile").click();
+$("importFile").addEventListener("change",(e)=>{
+  const f=e.target.files && e.target.files[0];
+  if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const incoming=JSON.parse(r.result);
+      if(!Array.isArray(incoming)) throw new Error("Formato inválido");
+      saveData(incoming);
+      alert("Importado ✅");
+      renderWeek();
+    }catch(err){ alert("No se pudo importar: "+err.message); }
+  };
+  r.readAsText(f);
+  e.target.value="";
+});
+
+// =================== ACTIVITY MODAL ===================
+const overlay=$("overlay");
+$("cancelBtn").onclick=()=> closeForm();
+overlay.addEventListener("click",(e)=>{ if(e.target===overlay) closeForm(); });
+
+function openForm(prefillDate=null, editing=null){
+  overlay.style.display="block";
+  const now=new Date();
+  $("f_fecha").value = prefillDate || ymd(now);
+  $("f_hora").value = String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+  $("f_estatus").value="Pendiente";
+  $("f_cliente").value=""; $("f_tel").value="";
+  $("f_colonia").value=""; $("f_cp").value=""; $("f_mun").value=""; $("f_edo").value="";
+  $("f_dir").value=""; $("f_notas").value="";
+  $("f_ocup").value=""; $("f_ocup_code").value=""; $("f_ocup_cat").value="";
+  hideSuggest($("colSuggest")); hideSuggest($("ocupSuggest"));
+
+  if(editing){
+    $("f_cliente").value=editing.cliente||"";
+    $("f_tel").value=editing.tel||"";
+    $("f_estatus").value=editing.estatus||"Pendiente";
+    $("f_fecha").value=editing.fecha||$("f_fecha").value;
+    $("f_hora").value=editing.hora||"";
+    $("f_colonia").value=editing.colonia||"";
+    $("f_cp").value=editing.cp||"";
+    $("f_mun").value=editing.municipio||"";
+    $("f_edo").value=editing.estado||"";
+    $("f_dir").value=editing.direccion||"";
+    $("f_ocup").value=editing.ocupacion||"";
+    $("f_ocup_code").value=editing.ocupacion_codigo||"";
+    $("f_ocup_cat").value=editing.ocupacion_categoria||"";
+    $("f_notas").value=editing.notas||"";
+    bindSaveEdit(editing.id);
+  } else {
+    bindSaveNew();
+  }
+
+  $("f_cliente").focus();
+}
+function closeForm(){ overlay.style.display="none"; }
+
+$("mapsBtn").onclick=()=>{
+  const q=encodeURIComponent([$("f_dir").value,$("f_colonia").value,$("f_mun").value,$("f_edo").value,$("f_cp").value].filter(Boolean).join(", "));
+  window.open("https://www.google.com/maps/search/?api=1&query="+q);
+};
+
+function collectForm(){
+  const cliente=$("f_cliente").value.trim();
+  if(!cliente) return {error:"Pon el nombre del cliente."};
+  const tel=$("f_tel").value.trim();
+  if(tel && tel.replace(/\D/g,"").length<10) return {error:"Teléfono incompleto (10 dígitos)."};
+  return {
+    cliente,
+    tel,
+    estatus:$("f_estatus").value,
+    fecha:$("f_fecha").value,
+    hora:$("f_hora").value,
+    colonia:$("f_colonia").value.trim(),
+    cp:$("f_cp").value.trim(),
+    municipio:$("f_mun").value.trim(),
+    estado:$("f_edo").value.trim(),
+    direccion:$("f_dir").value.trim(),
+    ocupacion:$("f_ocup").value.trim(),
+    ocupacion_codigo:$("f_ocup_code").value.trim(),
+    ocupacion_categoria:$("f_ocup_cat").value.trim(),
+    notas:$("f_notas").value.trim()
+  };
+}
+
+function bindSaveNew(){
+  $("saveBtn").onclick=()=>{
+    const v=collectForm();
+    if(v.error) return alert(v.error);
+    const item={id:Math.random().toString(16).slice(2)+Date.now().toString(16), ...v, createdAt:Date.now()};
+    const data=loadData();
+    data.push(item);
+    saveData(data);
+    closeForm();
+    renderWeek();
+  };
+}
+function bindSaveEdit(id){
+  $("saveBtn").onclick=()=>{
+    const v=collectForm();
+    if(v.error) return alert(v.error);
+    const data=loadData();
+    const idx=data.findIndex(x=>x.id===id);
+    if(idx<0) return;
+    data[idx]={...data[idx], ...v, updatedAt:Date.now()};
+    saveData(data);
+    closeForm();
+    renderWeek();
+  };
+}
+
+// suggestions in modal
+const colSuggest=$("colSuggest");
+$("f_colonia").addEventListener("input", ()=>{
+  const q=norm($("f_colonia").value);
+  if(q.length<2) return hideSuggest(colSuggest);
+  const res=[];
+  for(const it of SEPOMEX_COLONIAS){
+    if(it.k.includes(q)){
+      res.push({...it, label:`${it.colonia} (${it.tipo}) — ${it.mun}, ${it.edo} — CP ${it.cp}`});
+      if(res.length>=20) break;
+    }
+  }
+  showSuggest(colSuggest,res,(pick)=>{
+    $("f_colonia").value=pick.colonia;
+    $("f_cp").value=pick.cp;
+    $("f_mun").value=pick.mun;
+    $("f_edo").value=pick.edo;
+    hideSuggest(colSuggest);
+  });
+});
+$("f_colonia").addEventListener("blur", ()=>setTimeout(()=>hideSuggest(colSuggest),150));
+
+const ocupSuggest=$("ocupSuggest");
+$("f_ocup").addEventListener("input", ()=>{
+  const q=norm($("f_ocup").value);
+  if(q.length<3) return hideSuggest(ocupSuggest);
+  const res=[];
+  for(const it of OFICIOS){
+    if(it.k.includes(q)){
+      res.push({...it, label:`${it.desc} — Código ${it.codigo} — ${it.cat}`});
+      if(res.length>=20) break;
+    }
+  }
+  showSuggest(ocupSuggest,res,(pick)=>{
+    $("f_ocup").value=pick.desc;
+    $("f_ocup_code").value=pick.codigo;
+    $("f_ocup_cat").value=pick.cat;
+    hideSuggest(ocupSuggest);
+  });
+});
+$("f_ocup").addEventListener("blur", ()=>setTimeout(()=>hideSuggest(ocupSuggest),150));
+
+// =================== CICLOS CALC ===================
+$("cyBack").onclick=()=> show("home");
+$("calcBtn").onclick=()=>{
+  const tipo=$("tipoCred").value;
+  const fp=$("firstPay").value;
+  if(!fp) return alert("Pon la fecha del primer pago.");
+  const first=new Date(fp+"T00:00:00");
+  const ref=$("refDate").value ? new Date($("refDate").value+"T00:00:00") : null;
+
+  const step = (tipo==="semanal") ? 7 : 14;
+  const targetN = (tipo==="semanal") ? 12 : 16;
+  const add = (targetN-1)*step;
+  const target = new Date(first);
+  target.setDate(target.getDate()+add);
+
+  const out=$("calcOut");
+  const refLine = ref ? `<div class="small" style="margin-top:6px">Referencia: ${pretty(ymd(ref))}</div>` : "";
+  out.innerHTML = `
+    <div style="font-weight:950;font-size:16px">Resultado</div>
+    <div class="small" style="margin-top:6px">Tipo: <b>${tipo==="semanal"?"Semanal":"Bisemanal"}</b></div>
+    <div class="small" style="margin-top:6px">Primer pago (Semana 1): <b>${pretty(ymd(first))}</b></div>
+    <div class="small" style="margin-top:6px">Semana ${targetN}: <b>${pretty(ymd(target))}</b></div>
+    ${refLine}
+    <hr>
+    <div class="small">Cálculo: Semana ${targetN} = Primer pago + ${(targetN-1)} * ${step} días.</div>
+  `;
+  out.style.display="block";
+};
+
+// =================== INIT ===================
+function init(){
+  // defaults for ciclos
+  const t=new Date();
+  $("refDate").value=ymd(t);
+  $("firstPay").value=ymd(t);
+
+  renderWeek();
+  renderTodayBox();
+
+  // home back buttons
+  $("cpBack").onclick=()=> show("home");
+  $("ofBack").onclick=()=> show("home");
+  $("numBack").onclick=()=> show("home");
+}
+
+// start on lock screen
+document.getElementById("year").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
